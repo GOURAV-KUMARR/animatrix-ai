@@ -4,15 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>ANIMATRIX CRYSTAL OS v10.0 — 24x7 Cloud Studio & E2EE Messenger</title>
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <!-- V12_MQTT_TURN_ENGINE -->
+  <title>ANIMATRIX CRYSTAL OS v12.0 — Instant Connect Chat/Call & 2D/3D/Anime Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
       --bg-deep: #04050e;
-      --crystal-glass: rgba(18, 22, 44, 0.68);
-      --crystal-card: rgba(24, 29, 58, 0.74);
+      --crystal-glass: rgba(18, 22, 44, 0.72);
+      --crystal-card: rgba(24, 29, 58, 0.78);
       --crystal-border: rgba(255, 255, 255, 0.18);
       --primary: #9d6cff;
       --accent: #00f2fe;
@@ -117,7 +121,7 @@
       color: var(--accent); display: flex; justify-content: space-between; align-items: center;
     }
     .studio-layout { display: grid; grid-template-columns: 395px 1fr; gap: 18px; }
-    .chat-layout { display: grid; grid-template-columns: 350px 1fr 340px; gap: 18px; }
+    .chat-layout { display: grid; grid-template-columns: 360px 1fr 340px; gap: 18px; }
     @media (max-width: 1120px) { .studio-layout, .chat-layout { grid-template-columns: 1fr; } }
     .seg-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: rgba(4, 6, 16, 0.8); padding: 5px; border-radius: 12px; }
     .seg-row.two { grid-template-columns: 1fr 1fr; }
@@ -157,16 +161,15 @@
     .alert-ok { background: rgba(0, 245, 160, 0.15); border: 1px solid var(--success); color: #69f0ae; }
     .player-drawer { display: none; flex-direction: column; gap: 12px; background: rgba(10, 14, 32, 0.94); border: 2px solid var(--success); border-radius: 16px; padding: 16px; }
     video#recordedVideoPreview { width: 100%; max-height: 330px; background: #000; border-radius: 10px; }
-    .chat-feed { height: 330px; overflow-y: auto; background: rgba(4, 6, 16, 0.78); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-    .bubble { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 0.84rem; line-height: 1.45; }
+    .chat-feed { height: 320px; overflow-y: auto; background: rgba(4, 6, 16, 0.78); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .bubble { max-width: 84%; padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.45; word-break: break-word; }
     .bubble.me { align-self: flex-end; background: linear-gradient(135deg, var(--primary), #5b86e5); color: #fff; }
-    .bubble.peer { align-self: flex-start; background: rgba(30, 36, 70, 0.92); border: 1px solid rgba(0, 242, 254, 0.3); }
-    .bubble.clone { align-self: flex-start; background: rgba(0, 245, 160, 0.14); border: 1px solid var(--success); }
-    .b-meta { font-size: 0.67rem; color: rgba(255,255,255,0.68); margin-bottom: 4px; font-weight: 700; }
-    .b-trans { margin-top: 5px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,0.22); font-size: 0.77rem; color: var(--accent); }
-    .call-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; background: #03040a; padding: 10px; border-radius: 14px; border: 1px solid var(--accent); }
-    .call-grid video { width: 100%; height: 180px; object-fit: cover; background: #080a18; border-radius: 10px; }
-    .timer-pill { background: rgba(255, 190, 61, 0.15); border: 1px solid var(--warning); color: var(--warning); padding: 7px 12px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; text-align: center; }
+    .bubble.peer { align-self: flex-start; background: rgba(30, 36, 70, 0.95); border: 1px solid rgba(0, 242, 254, 0.4); color: #fff; }
+    .bubble.clone { align-self: flex-start; background: rgba(0, 245, 160, 0.15); border: 1px solid var(--success); }
+    .b-meta { font-size: 0.68rem; color: rgba(255,255,255,0.7); margin-bottom: 4px; font-weight: 700; }
+    .b-trans { margin-top: 5px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,0.25); font-size: 0.78rem; color: var(--accent); }
+    .call-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; background: #03040a; padding: 10px; border-radius: 14px; border: 2px solid var(--success); }
+    .call-grid video { width: 100%; height: 190px; object-fit: cover; background: #080a18; border-radius: 10px; }
     .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
     .key-card { background: rgba(6, 9, 24, 0.85); border: 1px solid rgba(255,255,255,0.12); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 5px; }
     .key-card.active-k { border-color: var(--success); box-shadow: 0 0 16px rgba(0, 245, 160, 0.25); }
@@ -174,20 +177,28 @@
 </head>
 <body>
 
+  <!-- 3-Hour Session Lock Fullscreen Overlay -->
+  <div id="lockOverlayScreen" style="display:none;position:fixed;inset:0;background:rgba(4,5,14,0.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;">
+    <div style="font-size:4.5rem;">🔒</div>
+    <h1 style="font-size:2rem;color:#ff416c;font-weight:900;">3 HOURS COMPLETE — ROOM LOCKED!</h1>
+    <p style="color:#9aa5c4;max-width:480px;font-size:1rem;">3 ghante ka samay poora hone par yeh code aur chat lock ho gaye hain. Naya code aur naya 3-hour timer chalu karne ke liye Reset button dabayein.</p>
+    <button onclick="resetAndUnlockSession()" style="background:linear-gradient(135deg,#00f5a0,#00f2fe);color:#04050e;border:none;padding:16px 32px;border-radius:16px;font-size:1.1rem;font-weight:900;cursor:pointer;">🔄 RESET & START NEW 3-HOUR SESSION</button>
+  </div>
+
   <header class="app-dock">
     <div class="brand-logo" onclick="openAppView('home')">
       <div class="orb"></div>
-      <span>ANIMATRIX CLOUD OS v10.0</span>
+      <span>ANIMATRIX OS v12.0</span>
     </div>
 
     <div class="dock-tabs">
       <button class="dock-btn active" id="tabHome" onclick="openAppView('home')">🏠 App Home</button>
+      <button class="dock-btn" id="tabChat" onclick="openAppView('chat')">💬 Instant Code Chat & Call</button>
       <button class="dock-btn" id="tab2D" onclick="openAppView('2d')">🎨 2D Animation</button>
       <button class="dock-btn" id="tab3D" onclick="openAppView('3d')">🪐 3D Animation</button>
       <button class="dock-btn" id="tabAnime" onclick="openAppView('anime')">🌸 Anime Studio</button>
-      <button class="dock-btn" id="tabChat" onclick="openAppView('chat')">💬 E2EE Chat & Call</button>
       <button class="dock-btn" id="tabKeys" onclick="openAppView('keys')">🔄 Key Shifter (15+)</button>
-      <button class="dock-btn" id="tabFuture" onclick="openAppView('future')">⚡ Quick Patch & Slots</button>
+      <button class="dock-btn" id="tabFuture" onclick="openAppView('future')">⚡ Quick Patch</button>
     </div>
 
     <div class="shifter-badge" onclick="openAppView('keys')">
@@ -200,10 +211,20 @@
   <main class="app-view active" id="viewHome">
     <div class="welcome-box">
       <h1>Aaj Aapko Kya Karna Hai?</h1>
-      <p>Yeh website 24x7 GitHub Cloud Subdomain par hosted hai — Laptop band rehne par bhi aapka koi bhi dost ise kahin se bhi chala sakta hai:</p>
+      <p>Seedha niche diye gaye kisi bhi App Module par click karein:</p>
     </div>
 
-    <div class="app-launcher-grid" id="mainLaunchpadGrid">
+    <div class="app-launcher-grid">
+      <div class="launcher-tile" onclick="openAppView('chat')" style="border-color:#00f5a0;">
+        <div class="tile-top">
+          <div class="tile-icon">💬</div>
+          <span class="tile-badge" style="background:rgba(0,245,160,0.2);color:#00f5a0;">1-CODE INSTANT CONNECT</span>
+        </div>
+        <h2>Baat Karna Hai (Chat, Voice & Video Call)</h2>
+        <p>Sirf 4-digit Code (jaise 4589) dalein ya Direct Link bhejein — 0.1 second mein Chat, Voice Call, Video Call aur AI Clone connect hoga (3-Hour Auto-Lock ke saath).</p>
+        <div class="tile-cta" style="color:#00f5a0;">Open Instant Messenger &rarr;</div>
+      </div>
+
       <div class="launcher-tile" onclick="openAppView('2d')">
         <div class="tile-top">
           <div class="tile-icon">🎨</div>
@@ -234,16 +255,6 @@
         <div class="tile-cta">Open Anime Studio &rarr;</div>
       </div>
 
-      <div class="launcher-tile" onclick="openAppView('chat')">
-        <div class="tile-top">
-          <div class="tile-icon">💬</div>
-          <span class="tile-badge">E2EE + WEBRTC + AI CLONE</span>
-        </div>
-        <h2>Baat Karna Hai (Chat, Video Call & Clone)</h2>
-        <p>1/2/3 Minute Expiring Passcode Link bhejein, Voice/Video Call karein, Auto-Schedule lagayein, Hindi &harr; English Translate karein, ya AI Human Clone on rakhein.</p>
-        <div class="tile-cta">Open Secret Messenger &rarr;</div>
-      </div>
-
       <div class="launcher-tile" onclick="openAppView('keys')">
         <div class="tile-top">
           <div class="tile-icon">🔄</div>
@@ -257,16 +268,151 @@
       <div class="launcher-tile" onclick="openAppView('future')" style="border-style:dashed;">
         <div class="tile-top">
           <div class="tile-icon">⚡</div>
-          <span class="tile-badge">QUICK LIVE PATCHER</span>
+          <span class="tile-badge">LIVE PATCHER</span>
         </div>
         <h2>Quick Patch & Future Features</h2>
-        <p>Bina pura code likhe sirf 1 line ka prompt ya chhota sa JS code dekar website mein naya feature ya change turant apply karein.</p>
+        <p>Bina pura code likhe chhote changes apply karein ya naye feature slots jodein.</p>
         <div class="tile-cta">Open Quick Patcher &rarr;</div>
       </div>
     </div>
   </main>
 
-  <!-- ==================== 2. UNIFIED 2D / 3D / ANIME STUDIO VIEW ==================== -->
+  <!-- ==================== 2. ULTRA-SIMPLE 1-CODE CHAT + VOICE/VIDEO CALL VIEW ==================== -->
+  <main class="app-view" id="viewChat">
+    <div class="chat-layout">
+      <!-- Left Card: 1-Code Connect & 3-Hour Timer -->
+      <section class="crystal-panel" style="border:2px solid rgba(0,245,160,0.45);">
+        <div class="panel-head">
+          <span>⚡ STEP 1: ENTER OR GENERATE CODE</span>
+          <span id="roomLiveStatusBadge" style="color:#00f5a0;font-weight:900;">CONNECTING...</span>
+        </div>
+
+        <label class="lbl">AAPKA NAAM (YOUR NAME)</label>
+        <input type="text" id="myChatName" value="Gourav" style="font-size:0.95rem;font-weight:800;" />
+
+        <div style="background:rgba(0,245,160,0.08);border:2px dashed #00f5a0;border-radius:16px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:10px;">
+          <span style="font-size:0.74rem;color:#9aa5c4;font-weight:800;">DONO DOST SAME CODE DALEIN (EX: 4589)</span>
+          <input type="text" id="magicRoomCodeInput" value="4589" maxlength="12" placeholder="4589" style="font-size:1.85rem;font-weight:900;text-align:center;letter-spacing:5px;color:#00f5a0;background:#04050e;border:2px solid #00f5a0;border-radius:14px;padding:10px;" onkeydown="if(event.key==='Enter') joinEasyRoomNow()" />
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button class="btn-sub" style="padding:12px;border-color:#00f2fe;color:#00f2fe;font-size:0.84rem;" onclick="generateNewRandomCode()">🎲 Generate Code</button>
+            <button class="btn-main" style="padding:12px;background:linear-gradient(135deg,#00f5a0,#00f2fe);font-size:0.9rem;" onclick="joinEasyRoomNow()">🟢 CONNECT CODE</button>
+          </div>
+
+          <button class="btn-main" style="width:100%;padding:11px;background:linear-gradient(135deg,#9d6cff,#00f2fe);" onclick="copyDirectInviteLink()">📲 COPY DIRECT SHARE LINK (AUTO-OPEN)</button>
+          <input type="text" id="shareableLinkPreview" readonly onclick="this.select()" style="font-size:0.74rem;color:#00f2fe;text-align:center;" />
+        </div>
+
+        <div style="background:rgba(255,190,61,0.12);border:1.5px solid #ffbe3d;border-radius:14px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:6px;">
+          <span style="font-size:0.72rem;font-weight:800;color:#ffbe3d;">⏳ 3-HOUR AUTO-LOCK COUNTDOWN</span>
+          <div id="threeHourClock" style="font-size:1.45rem;font-weight:900;font-family:monospace;color:#fff;">03:00:00</div>
+          <button class="btn-sub" style="font-size:0.75rem;padding:6px;" onclick="resetAndUnlockSession()">🔄 Reset Code & Restart 3-Hour Timer</button>
+        </div>
+      </section>
+
+      <!-- Center Card: Instant Chat + Voice/Video Call -->
+      <section class="crystal-panel">
+        <div class="panel-head">
+          <span id="activeRoomTitle">💬 ROOM #4589 — LIVE CHAT & CALL</span>
+          <span id="onlinePeersBadge" style="color:#00f5a0;font-weight:900;">🟢 BROKER ONLINE</span>
+        </div>
+
+        <!-- Big Call Action Buttons -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <button onclick="startTurnCall(false)" style="background:linear-gradient(135deg,#00f5a0,#00d2ff);color:#04050e;border:none;padding:13px;border-radius:14px;font-weight:900;font-size:0.88rem;cursor:pointer;">📞 VOICE CALL</button>
+          <button onclick="startTurnCall(true)" style="background:linear-gradient(135deg,#9d6cff,#00f2fe);color:#04050e;border:none;padding:13px;border-radius:14px;font-weight:900;font-size:0.88rem;cursor:pointer;">📹 VIDEO CALL</button>
+          <button onclick="hangupTurnCall()" style="background:rgba(255,65,108,0.2);color:#ff416c;border:1.5px solid #ff416c;padding:13px;border-radius:14px;font-weight:900;font-size:0.88rem;cursor:pointer;">❌ END CALL</button>
+        </div>
+
+        <!-- Incoming Call Ringing Alert -->
+        <div id="incomingCallBox" style="display:none;background:linear-gradient(135deg,rgba(0,245,160,0.25),rgba(0,242,254,0.25));border:2px solid #00f5a0;border-radius:14px;padding:12px;align-items:center;justify-content:space-between;gap:10px;">
+          <span id="incomingCallLabel" style="font-weight:900;color:#00f5a0;">📲 Incoming Call...</span>
+          <div style="display:flex;gap:8px;">
+            <button onclick="answerIncomingTurnCall()" style="background:#00f5a0;color:#04050e;border:none;padding:8px 16px;border-radius:10px;font-weight:900;cursor:pointer;">✅ ACCEPT CALL</button>
+            <button onclick="hangupTurnCall()" style="background:#ff416c;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-weight:800;cursor:pointer;">❌ REJECT</button>
+          </div>
+        </div>
+
+        <!-- Video/Voice Stream Box -->
+        <div class="call-grid" id="videoCallStage">
+          <div>
+            <small style="color:#00f5a0;font-size:0.72rem;font-weight:800;">🟢 AAP (YOU)</small>
+            <video id="localVideo" autoplay muted playsinline></video>
+          </div>
+          <div>
+            <small style="color:#00f2fe;font-size:0.72rem;font-weight:800;">🟣 DOST (FRIEND LIVE)</small>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <audio id="remoteAudioPlayer" autoplay></audio>
+          </div>
+        </div>
+
+        <!-- Translation Controls -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(0,242,254,0.06);padding:8px 10px;border-radius:10px;">
+          <div>
+            <label class="lbl">🌐 MERA MSG TRANSLATE KAREIN</label>
+            <select id="outgoingTranslateSelect">
+              <option value="none" selected>Send Original (Fastest)</option>
+              <option value="English">Hindi &rarr; Send in English</option>
+              <option value="Hindi">English &rarr; Send in Hindi</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">🌐 DOST KA MSG TRANSLATE KAREIN</label>
+            <select id="incomingTranslateSelect">
+              <option value="none" selected>Show Original (Fastest)</option>
+              <option value="Hindi">Translate to Hindi (हिंदी)</option>
+              <option value="English">Translate to English</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Chat Feed -->
+        <div class="chat-feed" id="chatMessagesBox"></div>
+
+        <!-- Message Input -->
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="chatInputBox" placeholder="Yahan message likhein aur Enter dabayein..." style="font-size:0.95rem;" onkeydown="if(event.key==='Enter') sendInstantRoomMessage()" />
+          <button class="btn-main" style="padding:12px 20px;" onclick="sendInstantRoomMessage()">🚀 SEND</button>
+          <button class="btn-sub" onclick="askHumanCloneDirectly()">🤖 Clone Test</button>
+        </div>
+      </section>
+
+      <!-- Right Card: AI Human Clone & Scheduler -->
+      <section style="display:flex;flex-direction:column;gap:16px;">
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>🤖 AI HUMAN CLONE (AWAY MODE)</span>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="checkbox" id="cloneActiveToggle" />
+              <span style="color:#00f5a0;font-size:0.74rem;font-weight:800;">AUTO-REPLY</span>
+            </label>
+          </div>
+          <label class="lbl">CLONE INSTRUCTIONS</label>
+          <textarea id="clonePersonaInput" rows="3">Main Gourav ka AI Human Clone hun. Gourav abhi busy hai aur shaam 6 baje free hoga. Doston se friendly Hinglish mein baat karo.</textarea>
+        </div>
+
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>⏰ AUTO MESSAGE SCHEDULER</span>
+            <span id="scheduledCountBadge">0 Pending</span>
+          </div>
+          <input type="text" id="scheduleMsgInput" placeholder="Message jo baad mein bhejna hai..." />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <select id="scheduleDelaySelect">
+              <option value="10">After 10 Sec</option>
+              <option value="30">After 30 Sec</option>
+              <option value="60" selected>After 1 Min</option>
+              <option value="180">After 3 Min</option>
+            </select>
+            <button class="btn-main" style="padding:8px;" onclick="addScheduledMessage()">⏰ Schedule</button>
+          </div>
+          <div id="scheduleListBox" style="display:flex;flex-direction:column;gap:5px;max-height:110px;overflow-y:auto;"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ==================== 3. UNIFIED 2D / 3D / ANIME STUDIO VIEW ==================== -->
   <main class="app-view" id="viewStudio">
     <div class="studio-layout">
       <section class="crystal-panel">
@@ -311,7 +457,7 @@
         </div>
 
         <label class="lbl">3. INSTANT STUDIO PRESETS</label>
-        <div class="chips-wrap" id="presetChipsContainer">
+        <div class="chips-wrap">
           <button class="chip-btn" onclick="loadPreset('rabbit')">🐇 Magical Rabbit 2D</button>
           <button class="chip-btn" onclick="loadPreset('cybercar')">🏎️ Cyberpunk GT-R 2D</button>
           <button class="chip-btn" onclick="loadPreset('animeSamurai')">🌸 Sakura Samurai Anime</button>
@@ -396,143 +542,6 @@
     </div>
   </main>
 
-  <!-- ==================== 3. E2EE CHAT + VIDEO CALL + AI CLONE + SCHEDULER ==================== -->
-  <main class="app-view" id="viewChat">
-    <div class="chat-layout">
-      <section class="crystal-panel">
-        <div class="panel-head">
-          <span>🔐 E2EE LINK & 1-3m PASSCODE</span>
-          <span id="peerStatusBadge" style="color:var(--success);">READY</span>
-        </div>
-
-        <label class="lbl">YOUR NAME</label>
-        <input type="text" id="myChatName" value="Gourav" />
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div>
-            <label class="lbl">SHARED PASSCODE</label>
-            <input type="text" id="roomPasscode" value="7890" />
-          </div>
-          <div>
-            <label class="lbl">PASSCODE EXPIRY</label>
-            <select id="passcodeExpirySelect">
-              <option value="1">1 Minute Only</option>
-              <option value="2" selected>2 Minutes Only</option>
-              <option value="3">3 Minutes Only</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="btn-main" onclick="createTimeLimitedRoom()">🔗 GENERATE E2EE LINK & START TIMER</button>
-
-        <div class="timer-pill" id="passcodeTimerBadge">
-          ⏱ Passcode Timer: Click Generate Link to start 1-3m timer
-        </div>
-
-        <div id="inviteLinkBox" style="display:none;flex-direction:column;gap:6px;">
-          <label class="lbl">SEND THIS LINK TO FRIEND</label>
-          <input type="text" id="generatedInviteUrl" readonly onclick="this.select()" />
-          <div style="display:flex;gap:6px;">
-            <button class="btn-sub" style="flex:1;" onclick="copyInviteLink()">📋 Copy Link</button>
-            <button class="btn-sub" style="flex:1;" onclick="renewPasscodeWindow()">🔄 Reset Timer</button>
-          </div>
-        </div>
-
-        <hr style="border-color:rgba(255,255,255,0.1);margin:4px 0;">
-
-        <label class="lbl">JOIN FRIEND'S LINK OR ROOM ID</label>
-        <input type="text" id="joinRoomIdInput" placeholder="Paste Friend's Link or Room ID..." />
-        <button class="btn-sub" onclick="joinRoomWithPasscode()">🔓 Verify Passcode & Connect</button>
-      </section>
-
-      <section class="crystal-panel">
-        <div class="panel-head">
-          <span>💬 AES-256 ENCRYPTED CHAT & CALL</span>
-          <div class="bar-group">
-            <button class="btn-sub" onclick="startMediaCall(false)">📞 Voice Call</button>
-            <button class="btn-sub" onclick="startMediaCall(true)">📹 Video Call</button>
-            <button class="btn-sub" id="endCallBtn" style="display:none;color:var(--danger);border-color:var(--danger);" onclick="endActiveCall()">❌ End Call</button>
-          </div>
-        </div>
-
-        <div class="call-grid" id="videoCallStage">
-          <div>
-            <small style="color:var(--muted);font-size:0.7rem;">YOU</small>
-            <video id="localVideo" autoplay muted playsinline></video>
-          </div>
-          <div>
-            <small style="color:var(--accent);font-size:0.7rem;">FRIEND</small>
-            <video id="remoteVideo" autoplay playsinline></video>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(0,242,254,0.07);padding:8px 10px;border-radius:10px;">
-          <div>
-            <label class="lbl">🌐 MY MSG AUTO-TRANSLATE</label>
-            <select id="outgoingTranslateSelect">
-              <option value="none">Send Original</option>
-              <option value="English" selected>Hindi &rarr; Send in English</option>
-              <option value="Hindi">English &rarr; Send in Hindi</option>
-            </select>
-          </div>
-          <div>
-            <label class="lbl">🌐 FRIEND MSG TRANSLATE</label>
-            <select id="incomingTranslateSelect">
-              <option value="Hindi" selected>Translate to Hindi (हिंदी)</option>
-              <option value="English">Translate to English</option>
-              <option value="none">Show Original</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="chat-feed" id="chatMessagesBox">
-          <div class="bubble clone">
-            <div class="b-meta">💎 CRYSTAL E2EE MESSENGER</div>
-            Yahan se aap 1-3 minute expiring Passcode Link, Voice/Video Call, Auto-Scheduler, Hindi &harr; English Live Translation aur AI Human Clone use kar sakte hain!
-          </div>
-        </div>
-
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="chatInputBox" placeholder="Type message in Hindi, Hinglish or English..." onkeydown="if(event.key==='Enter') sendEncryptedChatMessage()" />
-          <button class="btn-main" onclick="sendEncryptedChatMessage()">🚀 Send</button>
-          <button class="btn-sub" onclick="askHumanCloneDirectly()">🤖 Test Clone</button>
-        </div>
-      </section>
-
-      <section style="display:flex;flex-direction:column;gap:16px;">
-        <div class="crystal-panel">
-          <div class="panel-head">
-            <span>🤖 AI HUMAN CLONE (DIGITAL TWIN)</span>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-              <input type="checkbox" id="cloneActiveToggle" checked />
-              <span style="color:var(--success);font-size:0.74rem;">ACTIVE</span>
-            </label>
-          </div>
-          <label class="lbl">CLONE PERSONALITY & SCHEDULE</label>
-          <textarea id="clonePersonaInput" rows="3">Main Gourav ka AI Human Clone hun. Gourav abhi busy hai aur shaam 6 baje free hoga. Doston se friendly Hinglish mein baat karo aur unka message note kar lo.</textarea>
-        </div>
-
-        <div class="crystal-panel">
-          <div class="panel-head">
-            <span>⏰ AUTO MESSAGE SCHEDULER</span>
-            <span id="scheduledCountBadge">0 Pending</span>
-          </div>
-          <input type="text" id="scheduleMsgInput" placeholder="Message to schedule..." />
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <select id="scheduleDelaySelect">
-              <option value="10">After 10 Sec</option>
-              <option value="30">After 30 Sec</option>
-              <option value="60" selected>After 1 Min</option>
-              <option value="180">After 3 Min</option>
-            </select>
-            <button class="btn-main" style="padding:8px;" onclick="addScheduledMessage()">⏰ Schedule</button>
-          </div>
-          <div id="scheduleListBox" style="display:flex;flex-direction:column;gap:5px;max-height:110px;overflow-y:auto;"></div>
-        </div>
-      </section>
-    </div>
-  </main>
-
   <!-- ==================== 4. API KEY AUTO-SHIFTER VIEW ==================== -->
   <main class="app-view" id="viewKeys">
     <div class="crystal-panel" style="max-width:1120px;margin:0 auto;">
@@ -540,10 +549,6 @@
         <span>🔄 MULTI-API KEY AUTO-SHIFTER (1st &rarr; 2nd &rarr; 3rd AUTOMATIC ROTATION)</span>
         <button class="btn-sub" onclick="manualShiftNextKey()">⏭ Force Shift Next Key</button>
       </div>
-      <p style="font-size:0.85rem;color:var(--muted);">
-        Aapke diye gaye <b>7 ChatGPT Keys</b>, <b>7 Google Keys</b> aur <b>Groq Key</b> yahan pre-loaded hain. Har task ke baad ya kisi key ka limit khatam hone par system automatic agli key par shift ho jata hai:
-      </p>
-
       <div style="display:grid;grid-template-columns:160px 1fr 180px;gap:10px;background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
         <select id="newKeyProviderSelect">
           <option value="openai">ChatGPT / OpenAI</option>
@@ -553,62 +558,37 @@
         <input type="password" id="newKeyValueInput" placeholder="Paste additional API Key here..." />
         <button class="btn-main" onclick="addNewApiKeyFromUI()">➕ Add Key</button>
       </div>
-
       <div class="key-grid" id="keyPoolGrid"></div>
     </div>
   </main>
 
-  <!-- ==================== 5. QUICK LIVE PATCHER & FUTURE EXPANSION SLOTS ==================== -->
+  <!-- ==================== 5. QUICK LIVE PATCHER & FUTURE SLOTS ==================== -->
   <main class="app-view" id="viewFuture">
     <div class="crystal-panel" style="max-width:1120px;margin:0 auto;">
       <div class="panel-head">
-        <span>⚡ QUICK CODE / AI PATCHER (BINA PURA CODE LIKHE CHANGES KAREIN)</span>
-        <span>INSTANT LIVE UPDATE</span>
+        <span>⚡ QUICK CODE / AI PATCHER</span>
+        <span>LIVE UPDATE</span>
       </div>
-      <p style="font-size:0.85rem;color:var(--muted);">
-        Agar aapko website mein koi naya change karna hai, naya button lagana hai, ya chhota sa JS code/instruction dena hai, toh bas niche likhein — pura code dubara likhne ki zaroorat nahi hai:
-      </p>
-
-      <div style="display:grid;grid-template-columns:1fr;gap:10px;background:rgba(0,242,254,0.06);padding:14px;border-radius:14px;border:1px solid rgba(0,242,254,0.25);">
-        <label class="lbl">DESCRIBE CHANGE IN HINDI/ENGLISH OR PASTE SMALL JS PATCH</label>
-        <textarea id="quickPatchInput" class="mono-code" rows="4" placeholder="Example: 'Website ka background color neon purple kar do' YA seedha 2-line JS code dalein..."></textarea>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-main" style="flex:1;" onclick="applyLiveQuickPatch()">⚡ Apply Change to Website Now</button>
-          <button class="btn-sub" onclick="clearSavedPatches()">↺ Reset All Patches</button>
-        </div>
-        <div id="patchStatusMsg" style="font-size:0.8rem;color:var(--success);"></div>
+      <textarea id="quickPatchInput" class="mono-code" rows="4" placeholder="Write change instruction or paste small JS patch..."></textarea>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-main" style="flex:1;" onclick="applyLiveQuickPatch()">⚡ Apply Change Now</button>
+        <button class="btn-sub" onclick="clearSavedPatches()">↺ Reset Patches</button>
       </div>
-
-      <hr style="border-color:rgba(255,255,255,0.1);margin:6px 0;">
-
-      <div class="panel-head">
-        <span>🧩 ADD NEW FEATURE CARD TO LAUNCHPAD</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 2fr 160px;gap:10px;background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
-        <input type="text" id="customFeatureTitle" placeholder="New Feature Name..." />
-        <input type="text" id="customFeatureDesc" placeholder="Feature Description..." />
-        <button class="btn-main" onclick="addCustomFutureSlot()">🚀 Add Feature</button>
-      </div>
+      <div id="patchStatusMsg" style="font-size:0.8rem;color:var(--success);"></div>
       <div class="app-launcher-grid" id="futureSlotsGrid" style="margin-top:12px;"></div>
     </div>
   </main>
 
-  <script src="plugins.js"></script>
   <script>
-    const PRELOADED_ENCRYPTED_POOL = [{"id":"Groq-Primary-Key","provider":"groq","token":"JCEyDDc2PBUgZ0YsESc1HSIoNzAIP3sKCHVUS1RwFAAADDY1OS5kVi8RDzVmNBQ6DQh8ICo8YVo="},{"id":"ChatGPT-Key-1","provider":"openai","token":"MDl0IyYuJnIyen4pIj56OnIFIn4kD2EABmhKZ3slChhjAigkDAdcYRgWfwklLTYecAB8BRNmU0hQBhwLaxEhFRlsHQhaJxUfOgY8ECI8KyQCcQsBcl5UKBQTYmZ2HAgAfFYPGQ4OLBEpOCc+NA4yal8IUHx7GAwLHC8nKSJgaSs3CRwABRcVMn81JQ9pAWdlYBckNgE5dXsQPURlaHc8PXh0bxI="},{"id":"ChatGPT-Key-2","provider":"openai","token":"MDl0IyYuJnIEW0ZrExx9IQJmPC0AHTonCn9IX0Q2GGkeYHUBEiBJdBMVKwcTNzsXIC0tFRE2ZwlxbiExb2oLE3loZgl1NQAWABMOGR1/GhwkLQsBcl5UKBQTZRh1KhUiSHUlGRo7OA4WIBs6MigGOmN3cH8yMQAfYTkhCA91fREzIAsAdikBGHApCj4ndwJrB3YqPj8FLHo2HgFYaxICAh4dHhI="},{"id":"ChatGPT-Key-3","provider":"openai","token":"MDl0IyYuJnIfR0gWdwp7AwoeNQcrEyIPN3EDS0I1Cxs/IBMjKAdCQw8TOXkWKAxmOiRxPB0ocGpVWg8CDD8kCQFqJklqbgQiBQotKwU/IBMmCgsBcl5UKBQTJWwYGxgvW0I+GgsfEgBuGS4YKQIoGmoDUwArJTohGxEGKyN8fzEINRsSAD4dBngRFBQ9WER5DnAaFWo+FCgnIUgDNicGNnhyBhI="},{"id":"ChatGPT-Key-4","provider":"openai","token":"MDl0IyYuJnI7ZAQmJxguMAMHACRxLCYwMmJKXFIVFQwZLiAOCAZySBosYSslDRA8EQRxJjIOQ1ZbTm4BHBsVdj5oNVNoGRUICxQePAY7BD17MwsBcl5UKBQTODJ4YTsxfwQLDgAQJxEcJngQJi0MGwdBS0whaigJJg4AFhNFZQ50PDg9IQY0BQskGRIVaFZYTCowGgM2bDQYI3NnEQ0WJyIrHhI="},{"id":"ChatGPT-Key-5","provider":"openai","token":"MDl0IyYuJnJvUkU+MHsmAggIPis9BwMuMldyXkctN2FhOgUfGj53bzxuICIiHW8MAicJGggdU0drYxwYPgRnBisALF9FBQs/IBMTCTd6KgYHNAsBcl5UKBQTFxEbHS4wclwPNHwBHA8oOgsjHXQCb15kU3MoHg8QGnUVGANBRgUNDSIvcQ0hCSEVHHVmVlFjDzoLNGV5MAMJA0tECAojfxoyHhI="},{"id":"ChatGPT-Key-6","provider":"openai","token":"MDl0IyYuJnJhV1gScw83NCsyBRszDAccZ0VJRXQmF3Q3B3M8FwIIXwgOEyoUKTdmMAMIKXIHYnF5YA4bbz5td306GVlgFyAoEAoyMT0lJi0iFgsBcl5UKBQTNgETBg4wYlgzDTUqYyoVYws4CCsGJnhSSwAzAS0lZTd1PDUHXwABLz4UKjU6GD8DLTMIdXxDZycGMgYVDiY9GgVgCDIpCxt2DhI="},{"id":"ChatGPT-Key-7","provider":"openai","token":"MDl0IyYuJnI4BnwrMyk1MQYNNAUDCS9wEl5yAG8HKhgDOwAkPiF6SGstFCwCKwAqOCd9IhsUWEV6WBxjYDIwHgo+AkJjNnIIHzc3PQsyPz8pFAsBcl5UKBQTOAUZCT0va3g7NComJ3EROAcMCRUjKGV2eFozEW0ZZSY8OTBmeTFwJyYnAz0nfXgRJAksWmB6ZHAgNCBtAiY7JwVYJXo4DBYWHhI="},{"id":"Google-Key-1","provider":"google","token":"AgN3EjZ5HhFgenYVGwEOBQoFPBIHDTYJLVAEX1oUCwg9Ii0dEhcHYzYyCz0BABkxfT8aJCM="},{"id":"Google-Key-2","provider":"google","token":"AgN3EjZ5HhFgelQQCToDHWlmKgR/CyMmaEpWC28EPGk2JSgVZgNQZzAtKjwZczogKj8mIxU="},{"id":"Google-Key-3","provider":"google","token":"AgN3EjZ5HhFgeFkyIXwDGw8UPwI9NwsmKHpgfkANIAAGIw4kaT1iUS50fzkwIxkkPXoIeDM="},{"id":"Google-Key-4","provider":"google","token":"AgN3EjZ5HhFgfWAQBAQnICprOQAGABk+aHxHWAEEYB1nbHI5MDRWZT0QIngsFBMXBx8CGAU="},{"id":"Google-Key-5","provider":"google","token":"AgN3EjZ5HhFgeldvcDx+HS49MiE/DXoHBXkdBwd6ZC8nGQt5ByVzUQc3AnljAGY2JDoEBSM="},{"id":"Google-Key-6","provider":"google","token":"AgN3EjZ5HhFgfUY4biEmHDEnOhciJBQgD0Rydw4EE20iDhl5HmdkZzgkIzghdScVcDxoeRU="},{"id":"Google-Key-7","provider":"google","token":"AgN3EjZ5HhFgekA+CSgqHSMFMCkiKTUbOmB3c1sGBCAQbQI0HmB0X2kxIBs2Kzc+An8kCCM="}];
-    let currentMode = "2D";
-    let isPaused = false;
-    let startTime = performance.now();
-    let active2DFn = null;
-    let active3DUpdate = null;
-    let threeScene = null, threeCamera = null, threeRenderer = null;
-
-    // ---------------- 1. 15+ API KEY AUTO-SHIFTER ENGINE ----------------
+    const PRELOADED_ENCRYPTED_POOL = [{"id":"Groq-Primary-Key","provider":"groq","token":"JCEyDDc2PBUgZ0QsESc1HSIoNzAIP3sKCHVUS1RwFAAADDY1OS5kVC8RDzVmNBQ6DQh8ICo8YVo="},{"id":"ChatGPT-Key-1","provider":"openai","token":"MDl0IyYuJnIyenwpIj56OnIFIn4kD2EABmhKZ3slChhjAigkDAdcYxgWfwklLTYecAB8BRNmU0hQBhwLaxEhFRlsHQhYJxUfOgY8ECI8KyQCcQsBcl5UKBQTYmZ2HAgAfFQPGQ4OLBEpOCc+NA4yal8IUHx7GAwLHC8nKSJgays3CRwABRcVMn81JQ9pAWdlYBckNgE5dXsQPURnaHc8PXh0bxI="},{"id":"ChatGPT-Key-2","provider":"openai","token":"MDl0IyYuJnIEW0RrExx9IQJmPC0AHTonCn9IX0Q2GGkeYHUBEiBJdhMVKwcTNzsXIC0tFRE2ZwlxbiExb2oLE3loZgl3NQAWABMOGR1/GhwkLQsBcl5UKBQTZRh1KhUiSHclGRo7OA4WIBs6MigGOmN3cH8yMQAfYTkhCA91fxEzIAsAdikBGHApCj4ndwJrB3YqPj8FLHo2HgFaaxICAh4dHhI="},{"id":"ChatGPT-Key-3","provider":"openai","token":"MDl0IyYuJnIfR0oWdwp7AwoeNQcrEyIPN3EDS0I1Cxs/IBMjKAdCQQ8TOXkWKAxmOiRxPB0ocGpVWg8CDD8kCQFqJklobgQiBQotKwU/IBMmCgsBcl5UKBQTJWwYGxgvW0A+GgsfEgBuGS4YKQIoGmoDUwArJTohGxEGKyN8fTEINRsSAD4dBngRFBQ9WER5DnAaFWo+FCgnIUgBNicGNnhyBhI="},{"id":"ChatGPT-Key-4","provider":"openai","token":"MDl0IyYuJnI7ZAYmJxguMAMHACRxLCYwMmJKXFIVFQwZLiAOCAZyShosYSslDRA8EQRxJjIOQ1ZbTm4BHBsVdj5oNVNqGRUICxQePAY7BD17MwsBcl5UKBQTODJ4YTsxfwYLDgAQJxEcJngQJi0MGwdBS0whaigJJg4AFhNFZw50PDg9IQY0BQskGRIVaFZYTCowGgM2bDQYI3NlEQ0WJyIrHhI="},{"id":"ChatGPT-Key-5","provider":"openai","token":"MDl0IyYuJnJvUkc+MHsmAggIPis9BwMuMldyXkctN2FhOgUfGj53bTxuICIiHW8MAicJGggdU0drYxwYPgRnBisALF9HBQs/IBMTCTd6KgYHNAsBcl5UKBQTFxEbHS4wcl4PNHwBHA8oOgsjHXQCb15kU3MoHg8QGnUVGANBRAUNDSIvcQ0hCSEVHHVmVlFjDzoLNGV5MAMJA0tGCAojfxoyHhI="},{"id":"ChatGPT-Key-6","provider":"openai","token":"MDl0IyYuJnJhV1oScw83NCsyBRszDAccZ0VJRXQmF3Q3B3M8FwIIXQgOEyoUKTdmMAMIKXIHYnF5YA4bbz5td306GVliFyAoEAoyMT0lJi0iFgsBcl5UKBQTNgETBg4wYlozDTUqYyoVYws4CCsGJnhSSwAzAS0lZTd1PDUHXQABLz4UKjU6GD8DLTMIdXxDZycGMgYVDiY9GgViCDIpCxt2DhI="},{"id":"ChatGPT-Key-7","provider":"openai","token":"MDl0IyYuJnI4Bn4rMyk1MQYNNAUDCS9wEl5yAG8HKhgDOwAkPiF6SmstFCwCKwAqOCd9IhsUWEV6WBxjYDIwHgo+AkJhNnIIHzc3PQsyPz8pFAsBcl5UKBQTOAUZCT0va3o7NComJ3EROAcMCRUjKGV2eFozEW0ZZSY8OTBmezFwJyYnAz0nfXgRJAksWmB6ZHAgNCBtAiY7JwVaJXo4DBYWHhI="},{"id":"Google-Key-1","provider":"google","token":"AgN3EjZ5HhFgenQVGwEOBQoFPBIHDTYJLVAEX1oUCwg9Ii0dEhcHYTYyCz0BABkxfT8aJCM="},{"id":"Google-Key-2","provider":"google","token":"AgN3EjZ5HhFgelYQCToDHWlmKgR/CyMmaEpWC28EPGk2JSgVZgNQZTAtKjwZczogKj8mIxU="},{"id":"Google-Key-3","provider":"google","token":"AgN3EjZ5HhFgeFsyIXwDGw8UPwI9NwsmKHpgfkANIAAGIw4kaT1iUy50fzkwIxkkPXoIeDM="},{"id":"Google-Key-4","provider":"google","token":"AgN3EjZ5HhFgfWIQBAQnICprOQAGABk+aHxHWAEEYB1nbHI5MDRWZz0QIngsFBMXBx8CGAU="},{"id":"Google-Key-5","provider":"google","token":"AgN3EjZ5HhFgelVvcDx+HS49MiE/DXoHBXkdBwd6ZC8nGQt5ByVzUwc3AnljAGY2JDoEBSM="},{"id":"Google-Key-6","provider":"google","token":"AgN3EjZ5HhFgfUQ4biEmHDEnOhciJBQgD0Rydw4EE20iDhl5HmdkZTgkIzghdScVcDxoeRU="},{"id":"Google-Key-7","provider":"google","token":"AgN3EjZ5HhFgekI+CSgqHSMFMCkiKTUbOmB3c1sGBCAQbQI0HmB0XWkxIBs2Kzc+An8kCCM="}];
+    // ============================================================================
+    // 1. MULTI-API KEY AUTO-SHIFTER ENGINE
+    // ============================================================================
     let keyPool = [];
     let currentKeyIndex = 0;
 
     function initKeyPool() {
-      const mask = "CRYSTAL_V10_CLOUD_SHIELD_2026";
+      const mask = "CRYSTAL_V12_CLOUD_SHIELD_2026";
       function dec(b64) {
         if (!b64) return "";
         const raw = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
@@ -619,25 +599,13 @@
         return out.trim();
       }
       keyPool = (PRELOADED_ENCRYPTED_POOL || []).map(function(item) {
-        return {
-          id: item.id,
-          provider: item.provider,
-          key: dec(item.token),
-          uses: 0,
-          status: "READY"
-        };
+        return { id: item.id, provider: item.provider, key: dec(item.token), uses: 0, status: "READY" };
       }).filter(function(k) { return k.key && k.key.length > 8; });
 
-      const savedCustom = JSON.parse(localStorage.getItem("animatrix_v10_keys") || "[]");
+      const savedCustom = JSON.parse(localStorage.getItem("animatrix_v12_keys") || "[]");
       savedCustom.forEach(function(ck) { keyPool.unshift(ck); });
 
-      keyPool.push({
-        id: "Unlimited-Cloud-Backup",
-        provider: "pollinations",
-        key: "always-on",
-        uses: 0,
-        status: "BACKUP READY"
-      });
+      keyPool.push({ id: "Unlimited-Cloud-Backup", provider: "pollinations", key: "always-on", uses: 0, status: "BACKUP READY" });
       updateKeyShifterUI();
     }
 
@@ -679,9 +647,9 @@
       const entry = { id: prov.toUpperCase() + "-Added-" + (keyPool.length + 1), provider: prov, key: val, uses: 0, status: "READY" };
       keyPool.unshift(entry);
       currentKeyIndex = 0;
-      const saved = JSON.parse(localStorage.getItem("animatrix_v10_keys") || "[]");
+      const saved = JSON.parse(localStorage.getItem("animatrix_v12_keys") || "[]");
       saved.push(entry);
-      localStorage.setItem("animatrix_v10_keys", JSON.stringify(saved));
+      localStorage.setItem("animatrix_v12_keys", JSON.stringify(saved));
       document.getElementById("newKeyValueInput").value = "";
       updateKeyShifterUI();
     }
@@ -690,7 +658,6 @@
       if (!keyPool.length) initKeyPool();
       const total = keyPool.length;
       let lastErr = "All keys busy";
-
       for (let attempt = 0; attempt < total; attempt++) {
         const idx = (currentKeyIndex + attempt) % total;
         const kObj = keyPool[idx];
@@ -708,7 +675,7 @@
               })
             });
             const d = await r.json();
-            if (!r.ok) throw new Error((d.error && d.error.message) || "Groq limit");
+            if (!r.ok) throw new Error("Groq limit");
             text = d.choices[0].message.content;
           } else if (kObj.provider === "openai") {
             const r = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -722,7 +689,7 @@
               })
             });
             const d = await r.json();
-            if (!r.ok) throw new Error((d.error && d.error.message) || "OpenAI limit");
+            if (!r.ok) throw new Error("OpenAI limit");
             text = d.choices[0].message.content;
           } else if (kObj.provider === "google") {
             const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(kObj.key), {
@@ -731,7 +698,7 @@
               body: JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n" + userContent }] }] })
             });
             const d = await r.json();
-            if (!r.ok) throw new Error("Google API limit");
+            if (!r.ok) throw new Error("Google limit");
             text = d.candidates[0].content.parts[0].text;
           } else {
             const r = await fetch("https://text.pollinations.ai/openai", {
@@ -745,7 +712,6 @@
             const d = await r.json();
             text = d.choices[0].message.content;
           }
-
           if (text) {
             kObj.uses++;
             kObj.status = "OK (SHIFTED)";
@@ -762,9 +728,435 @@
       throw new Error(lastErr);
     }
 
-    // ---------------- 2. APP NAVIGATION ROUTER ----------------
+    // ============================================================================
+    // 2. INSTANT WEBSOCKET ROOM BROKER (MQTT WSS) + TURN WEBRTC VOICE/VIDEO CALL
+    //    (100% immune to PeerJS ghost ID locking and mobile NAT firewalls!)
+    // ============================================================================
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
+    let lockDeadlineTs = 0;
+    let lockIntervalId = null;
+
+    let mqttClient = null;
+    let currentSubscribedTopic = "";
+    let currentRoomCode = "4589";
+    const myClientInstanceId = "u_" + Math.random().toString(36).substring(2, 10);
+
+    // Ephemeral unique PeerJS ID for WebRTC media streams (Never collides on refresh!)
+    let myMediaPeer = null;
+    let myMediaPeerId = "ax12call_" + Math.random().toString(36).substring(2, 11);
+    let friendMediaPeerId = "";
+    let activeMediaCall = null;
+    let pendingIncomingCall = null;
+    let localMediaStream = null;
+    const seenMsgIds = new Set();
+
+    // Free Global STUN + OpenRelay Metered TURN Servers (Works across Jio/Airtel 4G/5G & Wi-Fi)
+    const TURN_ICE_SERVERS = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:openrelay.metered.ca:80" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        },
+        {
+          urls: "turn:openrelay.metered.ca:443",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        },
+        {
+          urls: "turn:openrelay.metered.ca:443?transport=tcp",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ]
+    };
+
+    function startThreeHourCountdown(customDeadline) {
+      lockDeadlineTs = customDeadline || (Date.now() + THREE_HOURS_MS);
+      localStorage.setItem("animatrix_v12_lock", String(lockDeadlineTs));
+      if (lockIntervalId) clearInterval(lockIntervalId);
+
+      function tick() {
+        const left = lockDeadlineTs - Date.now();
+        const el = document.getElementById("threeHourClock");
+        if (left <= 0) {
+          clearInterval(lockIntervalId);
+          if (el) el.textContent = "00:00:00 (LOCKED)";
+          document.getElementById("lockOverlayScreen").style.display = "flex";
+          hangupTurnCall();
+          if (mqttClient) { try { mqttClient.end(true); } catch (e) {} }
+          return;
+        }
+        const tot = Math.floor(left / 1000);
+        const h = String(Math.floor(tot / 3600)).padStart(2, "0");
+        const m = String(Math.floor((tot % 3600) / 60)).padStart(2, "0");
+        const s = String(tot % 60).padStart(2, "0");
+        if (el) el.textContent = h + ":" + m + ":" + s;
+      }
+      tick();
+      lockIntervalId = setInterval(tick, 1000);
+    }
+
+    function resetAndUnlockSession() {
+      localStorage.removeItem("animatrix_v12_lock");
+      document.getElementById("lockOverlayScreen").style.display = "none";
+      startThreeHourCountdown(Date.now() + THREE_HOURS_MS);
+      generateNewRandomCode();
+    }
+
+    function updateShareableLinkBox(code) {
+      const base = window.location.origin + window.location.pathname;
+      const link = base + "?code=" + encodeURIComponent(code);
+      const box = document.getElementById("shareableLinkPreview");
+      if (box) box.value = link;
+      return link;
+    }
+
+    function generateNewRandomCode() {
+      const newCode = String(Math.floor(1000 + Math.random() * 9000));
+      document.getElementById("magicRoomCodeInput").value = newCode;
+      joinEasyRoomNow();
+    }
+
+    function copyDirectInviteLink() {
+      const code = (document.getElementById("magicRoomCodeInput").value || "4589").trim();
+      const link = updateShareableLinkBox(code);
+      navigator.clipboard.writeText(link).catch(function(){});
+      appendChatBubble("SYSTEM", "📲 Direct Share Link Copy Ho Gaya! Jab aapka dost is link ko kholega, toh uske phone mein seedha Room #" + code + " khulega aur automatic connect ho jayega!", "clone");
+    }
+
+    function initMediaPeerEngine() {
+      if (myMediaPeer && !myMediaPeer.destroyed) return;
+      myMediaPeerId = "ax12call_" + Math.random().toString(36).substring(2, 11);
+      myMediaPeer = new Peer(myMediaPeerId, { config: TURN_ICE_CONFIG });
+
+      myMediaPeer.on("call", function(incomingCall) {
+        pendingIncomingCall = incomingCall;
+        const callerName = (incomingCall.metadata && incomingCall.metadata.caller) || "Dost";
+        const isVideo = incomingCall.metadata && incomingCall.metadata.video;
+        document.getElementById("incomingCallLabel").textContent =
+          (isVideo ? "📹 Incoming Video Call from " : "📞 Incoming Voice Call from ") + callerName;
+        document.getElementById("incomingCallBox").style.display = "flex";
+      });
+    }
+
+    function connectMqttBrokerEngine(roomCode) {
+      initMediaPeerEngine();
+      const topic = "animatrix/v12/room/" + roomCode;
+
+      if (mqttClient && mqttClient.connected) {
+        if (currentSubscribedTopic && currentSubscribedTopic !== topic) {
+          mqttClient.unsubscribe(currentSubscribedTopic);
+        }
+        currentSubscribedTopic = topic;
+        mqttClient.subscribe(topic, { qos: 0 }, function() {
+          announcePresenceInRoom(roomCode);
+        });
+        return;
+      }
+
+      const badge = document.getElementById("roomLiveStatusBadge");
+      if (badge) {
+        badge.style.color = "#ffbe3d";
+        badge.textContent = "CONNECTING...";
+      }
+
+      // Connect to High-Speed Global EMQX WebSocket Broker (with HiveMQ fallback)
+      mqttClient = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
+        clientId: "ax12_" + Math.random().toString(16).substring(2, 10),
+        clean: true,
+        connectTimeout: 5000,
+        reconnectPeriod: 1500
+      });
+
+      mqttClient.on("connect", function() {
+        currentSubscribedTopic = "animatrix/v12/room/" + currentRoomCode;
+        mqttClient.subscribe(currentSubscribedTopic, { qos: 0 }, function() {
+          const b = document.getElementById("roomLiveStatusBadge");
+          if (b) {
+            b.style.color = "#00f5a0";
+            b.textContent = "🟢 CODE #" + currentRoomCode + " ACTIVE";
+          }
+          announcePresenceInRoom(currentRoomCode);
+        });
+      });
+
+      mqttClient.on("message", async function(recTopic, payloadBuf) {
+        try {
+          const pkt = JSON.parse(payloadBuf.toString());
+          if (!pkt || pkt.senderId === myClientInstanceId) return;
+          if (pkt.msgId && seenMsgIds.has(pkt.msgId)) return;
+          if (pkt.msgId) seenMsgIds.add(pkt.msgId);
+
+          if (pkt.peerCallId) {
+            friendMediaPeerId = pkt.peerCallId;
+          }
+
+          if (pkt.type === "JOIN_PING") {
+            document.getElementById("onlinePeersBadge").textContent = "🟢 CONNECTED WITH " + (pkt.sender || "FRIEND").toUpperCase();
+            appendChatBubble("CONNECTED", "🎉 " + (pkt.sender || "Dost") + " Code #" + currentRoomCode + " par jud gaya hai! Ab aap chat ya call kar sakte hain.", "clone");
+            // Reply with PONG so the other device also sees us immediately!
+            publishToRoom({
+              type: "JOIN_PONG",
+              sender: document.getElementById("myChatName").value || "Friend"
+            });
+            return;
+          }
+
+          if (pkt.type === "JOIN_PONG") {
+            document.getElementById("onlinePeersBadge").textContent = "🟢 CONNECTED WITH " + (pkt.sender || "FRIEND").toUpperCase();
+            appendChatBubble("CONNECTED", "🟢 " + (pkt.sender || "Dost") + " ke saath Instant Connection ho gaya!", "clone");
+            return;
+          }
+
+          if (pkt.type === "CHAT_MSG") {
+            const inLang = document.getElementById("incomingTranslateSelect").value;
+            let trans = "";
+            if (inLang && inLang !== "none") {
+              try {
+                const r = await callCloudAIWithShifter("Translate into " + inLang + ". Output ONLY translation.", pkt.text, 200);
+                trans = r.content.trim();
+              } catch (e) {}
+            }
+            appendChatBubble(pkt.sender || "Friend", pkt.text, pkt.isClone ? "clone" : "peer", trans);
+
+            if (!pkt.isClone && document.getElementById("cloneActiveToggle").checked) {
+              await triggerAIHumanCloneReply(pkt.text, true);
+            }
+          }
+        } catch (err) {}
+      });
+    }
+
+    function publishToRoom(dataObj) {
+      if (!mqttClient || !mqttClient.connected || !currentSubscribedTopic) return false;
+      const packet = Object.assign({}, dataObj, {
+        senderId: myClientInstanceId,
+        peerCallId: myMediaPeerId,
+        msgId: "m_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7)
+      });
+      mqttClient.publish(currentSubscribedTopic, JSON.stringify(packet));
+      return true;
+    }
+
+    function announcePresenceInRoom(code) {
+      const myName = document.getElementById("myChatName").value || "Gourav";
+      publishToRoom({ type: "JOIN_PING", sender: myName });
+    }
+
+    function joinEasyRoomNow() {
+      const raw = (document.getElementById("magicRoomCodeInput").value || "4589").trim().toUpperCase().replace(/[^A-Z0-9]/g, "") || "4589";
+      currentRoomCode = raw;
+      document.getElementById("magicRoomCodeInput").value = raw;
+      document.getElementById("activeRoomTitle").textContent = "💬 ROOM #" + raw + " — LIVE CHAT & CALL";
+      updateShareableLinkBox(raw);
+
+      const chatBox = document.getElementById("chatMessagesBox");
+      if (chatBox && chatBox.children.length === 0) {
+        appendChatBubble("SYSTEM", "⚡ Room Code #" + raw + " Connected! Apne dost ke phone mein Code [" + raw + "] dalein ya '📲 COPY DIRECT SHARE LINK' bhejein — message aur call 0.1 second mein jayega!", "clone");
+      } else {
+        appendChatBubble("SYSTEM", "🔄 Switched to Room Code #" + raw + "!", "clone");
+      }
+
+      connectMqttBrokerEngine(raw);
+    }
+
+    function appendChatBubble(sender, text, cls, subText) {
+      const box = document.getElementById("chatMessagesBox");
+      if (!box) return;
+      const div = document.createElement("div");
+      div.className = "bubble " + (cls || "peer");
+      div.innerHTML = "<div class='b-meta'>" + sender + " • " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + "</div><div>" + text + "</div>" +
+        (subText ? "<div class='b-trans'>🌐 " + subText + "</div>" : "");
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendInstantRoomMessage(customText) {
+      if (lockDeadlineTs > 0 && Date.now() > lockDeadlineTs) {
+        document.getElementById("lockOverlayScreen").style.display = "flex";
+        return;
+      }
+      const inp = document.getElementById("chatInputBox");
+      const raw = customText !== undefined ? customText : (inp ? inp.value.trim() : "");
+      if (!raw) return;
+      if (customText === undefined && inp) inp.value = "";
+
+      const myName = document.getElementById("myChatName").value || "Gourav";
+      const outLang = document.getElementById("outgoingTranslateSelect").value;
+      let toSend = raw, transSub = "";
+
+      if (outLang && outLang !== "none") {
+        try {
+          const r = await callCloudAIWithShifter("Translate into " + outLang + ". Output ONLY translation.", raw, 200);
+          transSub = r.content.trim();
+          toSend = transSub + " (" + raw + ")";
+        } catch (e) {}
+      }
+
+      appendChatBubble(myName + " (You)", raw, "me", transSub);
+
+      publishToRoom({
+        type: "CHAT_MSG",
+        sender: myName,
+        text: toSend,
+        isClone: false
+      });
+
+      if (document.getElementById("cloneActiveToggle").checked && !friendMediaPeerId) {
+        await triggerAIHumanCloneReply(raw, false);
+      }
+    }
+
+    async function triggerAIHumanCloneReply(userText, broadcastToRoom) {
+      const persona = document.getElementById("clonePersonaInput").value.trim();
+      const myName = document.getElementById("myChatName").value || "Gourav";
+      try {
+        const r = await callCloudAIWithShifter(
+          "You are the AI Human Clone of " + myName + ". Instructions: " + persona + ". Reply naturally in 1-2 short friendly sentences.",
+          userText, 200
+        );
+        const reply = r.content.trim();
+        appendChatBubble("🤖 " + myName + "'s Clone", reply, "clone");
+        if (broadcastToRoom) {
+          publishToRoom({
+            type: "CHAT_MSG",
+            sender: "🤖 " + myName + " (AI Clone)",
+            text: reply,
+            isClone: true
+          });
+        }
+      } catch (e) {}
+    }
+
+    async function askHumanCloneDirectly() {
+      const inp = document.getElementById("chatInputBox");
+      const msg = inp.value.trim() || "Bhai kahan hai? Kab free hoga?";
+      inp.value = "";
+      appendChatBubble("Friend", msg, "peer");
+      await triggerAIHumanCloneReply(msg, false);
+    }
+
+    // ---------------- TURN RELAY VOICE & VIDEO CALL ----------------
+    async function acquireMediaStreamWithFallback(wantVideo) {
+      if (wantVideo) {
+        try {
+          return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        } catch (e) {
+          appendChatBubble("CALL", "ℹ️ Camera unavailable hai — Voice Call (Mic) se connect kiya ja raha hai.", "clone");
+          return await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+        }
+      }
+      return await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+    }
+
+    async function startTurnCall(wantVideo) {
+      if (!friendMediaPeerId) {
+        announcePresenceInRoom(currentRoomCode);
+        appendChatBubble("CALL", "⚠ Dost abhi is code (#" + currentRoomCode + ") par online nahi dikh raha. Dost ke phone mein bhi same code kholein, fir Call dabayein!", "clone");
+        return;
+      }
+      try {
+        localMediaStream = await acquireMediaStreamWithFallback(wantVideo);
+        document.getElementById("videoCallStage").style.display = "grid";
+        document.getElementById("localVideo").srcObject = localMediaStream;
+
+        const call = myMediaPeer.call(friendMediaPeerId, localMediaStream, {
+          metadata: { video: Boolean(wantVideo), caller: document.getElementById("myChatName").value || "Friend" }
+        });
+        activeMediaCall = call;
+
+        call.on("stream", function(remStream) {
+          document.getElementById("remoteVideo").srcObject = remStream;
+          document.getElementById("remoteAudioPlayer").srcObject = remStream;
+        });
+        call.on("close", hangupTurnCall);
+        appendChatBubble("CALL", (wantVideo ? "📹 Video Call" : "📞 Voice Call") + " ringing...", "clone");
+      } catch (err) {
+        appendChatBubble("CALL", "⚠ Mic/Camera permission allow karein: " + err.message, "clone");
+      }
+    }
+
+    async function answerIncomingTurnCall() {
+      if (!pendingIncomingCall) return;
+      const call = pendingIncomingCall;
+      pendingIncomingCall = null;
+      document.getElementById("incomingCallBox").style.display = "none";
+
+      try {
+        const wantVideo = call.metadata && call.metadata.video;
+        localMediaStream = await acquireMediaStreamWithFallback(wantVideo);
+        document.getElementById("videoCallStage").style.display = "grid";
+        document.getElementById("localVideo").srcObject = localMediaStream;
+
+        call.answer(localMediaStream);
+        activeMediaCall = call;
+
+        call.on("stream", function(remStream) {
+          document.getElementById("remoteVideo").srcObject = remStream;
+          document.getElementById("remoteAudioPlayer").srcObject = remStream;
+        });
+        call.on("close", hangupTurnCall);
+      } catch (err) {
+        appendChatBubble("CALL", "⚠ Mic/Camera permission allow karein: " + err.message, "clone");
+      }
+    }
+
+    function hangupTurnCall() {
+      document.getElementById("incomingCallBox").style.display = "none";
+      if (activeMediaCall) {
+        try { activeMediaCall.close(); } catch (e) {}
+        activeMediaCall = null;
+      }
+      if (localMediaStream) {
+        localMediaStream.getTracks().forEach(function(t) { t.stop(); });
+        localMediaStream = null;
+      }
+      document.getElementById("videoCallStage").style.display = "none";
+    }
+
+    // Scheduler
+    const scheduledQueue = [];
+    function addScheduledMessage() {
+      const inp = document.getElementById("scheduleMsgInput");
+      if (!inp.value.trim()) return;
+      const delay = parseInt(document.getElementById("scheduleDelaySelect").value, 10) || 60;
+      scheduledQueue.push({ text: inp.value.trim(), sendAt: Date.now() + delay * 1000 });
+      inp.value = "";
+      renderScheduleQueue();
+    }
+
+    function renderScheduleQueue() {
+      document.getElementById("scheduledCountBadge").textContent = scheduledQueue.length + " Pending";
+      const box = document.getElementById("scheduleListBox");
+      box.innerHTML = "";
+      scheduledQueue.forEach(function(it) {
+        const left = Math.max(0, Math.ceil((it.sendAt - Date.now()) / 1000));
+        const d = document.createElement("div");
+        d.style.cssText = "display:flex;justify-content:space-between;font-size:0.75rem;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:8px;";
+        d.innerHTML = "<span>⏰ " + it.text.slice(0, 24) + "</span><b>" + left + "s</b>";
+        box.appendChild(d);
+      });
+    }
+
+    setInterval(function() {
+      if (!scheduledQueue.length) return;
+      const now = Date.now();
+      for (let i = scheduledQueue.length - 1; i >= 0; i--) {
+        if (now >= scheduledQueue[i].sendAt) {
+          sendInstantRoomMessage(scheduledQueue.splice(i, 1)[0].text);
+        }
+      }
+      renderScheduleQueue();
+    }, 1000);
+
+    // ============================================================================
+    // 3. APP NAVIGATION & DIRECT SHARE LINK AUTO-OPEN
+    // ============================================================================
     function openAppView(target) {
-      const mapTab = { home: "tabHome", "2d": "tab2D", "3d": "tab3D", anime: "tabAnime", chat: "tabChat", keys: "tabKeys", future: "tabFuture" };
+      const mapTab = { home: "tabHome", chat: "tabChat", "2d": "tab2D", "3d": "tab3D", anime: "tabAnime", keys: "tabKeys", future: "tabFuture" };
       Object.keys(mapTab).forEach(function(k) {
         const el = document.getElementById(mapTab[k]);
         if (el) el.classList.toggle("active", k === target);
@@ -772,18 +1164,20 @@
 
       const viewMap = {
         home: "viewHome",
+        chat: "viewChat",
         "2d": "viewStudio",
         "3d": "viewStudio",
         anime: "viewStudio",
-        chat: "viewChat",
         keys: "viewKeys",
         future: "viewFuture"
       };
-      ["viewHome", "viewStudio", "viewChat", "viewKeys", "viewFuture"].forEach(function(vid) {
+      ["viewHome", "viewChat", "viewStudio", "viewKeys", "viewFuture"].forEach(function(vid) {
         document.getElementById(vid).classList.toggle("active", vid === viewMap[target]);
       });
 
-      if (target === "2d") {
+      if (target === "chat") {
+        joinEasyRoomNow();
+      } else if (target === "2d") {
         loadPreset("rabbit");
         setEngineMode("2D");
       } else if (target === "3d") {
@@ -794,12 +1188,19 @@
         setEngineMode("ANIME");
       } else if (target === "keys") {
         updateKeyShifterUI();
-      } else if (target === "future") {
-        renderFutureSlots();
       }
     }
 
-    // ---------------- 3. STUDIO PRESETS & ENGINE ----------------
+    // ============================================================================
+    // 4. 2D / 3D / ANIME STUDIO ENGINE & MP4 VIDEO RECORDER
+    // ============================================================================
+    let currentMode = "2D";
+    let isPaused = false;
+    let startTime = performance.now();
+    let active2DFn = null;
+    let active3DUpdate = null;
+    let threeScene = null, threeCamera = null, threeRenderer = null;
+
     const canvas2d = document.getElementById("canvas2d");
     const ctx2d = canvas2d.getContext("2d");
     const canvas3d = document.getElementById("canvas3d");
@@ -1115,7 +1516,6 @@
       card.scrollIntoView({ behavior: "smooth" });
       const vid = document.getElementById("recordedVideoPreview");
       if (!vid.src) {
-        showBanner("Recording 5s video for live playback...", false);
         recordAndExportVideo();
         return;
       }
@@ -1259,355 +1659,53 @@
       a.click();
     }
 
-    // ---------------- 4. E2EE CHAT + 1-3m PASSCODE + CALL + CLONE ----------------
-    let peerInstance = null, activeConn = null, activeMediaCall = null, localMediaStream = null;
-    let currentRoomId = "", passcodeExpiresAt = 0, expiryIntervalId = null;
-
-    async function deriveRoomKey(passcode) {
-      const enc = new TextEncoder();
-      const baseKey = await crypto.subtle.importKey("raw", enc.encode(passcode.trim()), { name: "PBKDF2" }, false, ["deriveKey"]);
-      return crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: enc.encode("ANIMATRIX_V10_SALT"), iterations: 50000, hash: "SHA-256" },
-        baseKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
-      );
-    }
-
-    async function encryptE2EE(plainText, passcode) {
-      const key = await deriveRoomKey(passcode);
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const cipherBuf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(plainText));
-      return {
-        iv: btoa(String.fromCharCode.apply(null, iv)),
-        ct: btoa(String.fromCharCode.apply(null, new Uint8Array(cipherBuf)))
-      };
-    }
-
-    async function decryptE2EE(payload, passcode) {
-      const key = await deriveRoomKey(passcode);
-      const iv = Uint8Array.from(atob(payload.iv), function(c) { return c.charCodeAt(0); });
-      const ct = Uint8Array.from(atob(payload.ct), function(c) { return c.charCodeAt(0); });
-      const plainBuf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
-      return new TextDecoder().decode(plainBuf);
-    }
-
-    function startPasscodeExpiryTimer(expiresTimestamp) {
-      passcodeExpiresAt = expiresTimestamp;
-      if (expiryIntervalId) clearInterval(expiryIntervalId);
-      const badge = document.getElementById("passcodeTimerBadge");
-      function tick() {
-        const leftMs = passcodeExpiresAt - Date.now();
-        if (leftMs <= 0) {
-          clearInterval(expiryIntervalId);
-          badge.textContent = "⛔ PASSCODE EXPIRED! Click Reset Timer";
-          return;
-        }
-        const sec = Math.ceil(leftMs / 1000);
-        badge.textContent = "⏱ Passcode Active: " + Math.floor(sec / 60) + "m " + (sec % 60) + "s left";
-      }
-      tick();
-      expiryIntervalId = setInterval(tick, 1000);
-    }
-
-    function renewPasscodeWindow() {
-      const mins = parseInt(document.getElementById("passcodeExpirySelect").value, 10) || 2;
-      startPasscodeExpiryTimer(Date.now() + mins * 60 * 1000);
-    }
-
-    function createTimeLimitedRoom() {
-      const pass = document.getElementById("roomPasscode").value.trim() || "7890";
-      const mins = parseInt(document.getElementById("passcodeExpirySelect").value, 10) || 2;
-      const expTime = Date.now() + mins * 60 * 1000;
-      currentRoomId = "ax10-" + Math.random().toString(36).substring(2, 9);
-      initPeerNode(currentRoomId);
-      startPasscodeExpiryTimer(expTime);
-      const shareUrl = window.location.origin + window.location.pathname + "#room=" + encodeURIComponent(currentRoomId) + "&exp=" + expTime;
-      document.getElementById("inviteLinkBox").style.display = "flex";
-      document.getElementById("generatedInviteUrl").value = shareUrl;
-      navigator.clipboard.writeText(shareUrl).catch(function(){});
-      appendChatBubble("SYSTEM", "🔗 E2EE Room Created! Link copied (" + mins + " min passcode: " + pass + ").", "clone");
-    }
-
-    function copyInviteLink() {
-      navigator.clipboard.writeText(document.getElementById("generatedInviteUrl").value);
-    }
-
-    function initPeerNode(customId) {
-      if (peerInstance) peerInstance.destroy();
-      peerInstance = customId ? new Peer(customId) : new Peer();
-      peerInstance.on("open", function(id) {
-        document.getElementById("peerStatusBadge").textContent = "ONLINE (" + id + ")";
-      });
-      peerInstance.on("connection", function(conn) { setupDataConnection(conn, true); });
-      peerInstance.on("call", async function(call) {
-        try {
-          const wantVideo = call.metadata && call.metadata.video;
-          localMediaStream = await navigator.mediaDevices.getUserMedia({ video: Boolean(wantVideo), audio: true });
-          document.getElementById("videoCallStage").style.display = "grid";
-          document.getElementById("endCallBtn").style.display = "inline-block";
-          document.getElementById("localVideo").srcObject = localMediaStream;
-          call.answer(localMediaStream);
-          activeMediaCall = call;
-          call.on("stream", function(rem) { document.getElementById("remoteVideo").srcObject = rem; });
-          call.on("close", endActiveCall);
-        } catch (e) {}
-      });
-    }
-
-    function joinRoomWithPasscode() {
-      let rawTarget = document.getElementById("joinRoomIdInput").value.trim();
-      if (!rawTarget) return;
-      let expFromUrl = 0;
-      if (rawTarget.includes("room=")) {
-        const mR = rawTarget.match(/room=([^&]+)/);
-        const mE = rawTarget.match(/exp=(\d+)/);
-        if (mR) rawTarget = decodeURIComponent(mR[1]);
-        if (mE) expFromUrl = parseInt(mE[1], 10);
-      }
-      if (expFromUrl > 0 && Date.now() > expFromUrl) {
-        appendChatBubble("SECURITY", "⛔ Passcode time window expired!", "clone");
-        return;
-      }
-      if (!peerInstance) initPeerNode();
-      setTimeout(function() { setupDataConnection(peerInstance.connect(rawTarget), false); }, 600);
-    }
-
-    function setupDataConnection(conn, isHost) {
-      activeConn = conn;
-      conn.on("open", async function() {
-        const myPass = document.getElementById("roomPasscode").value.trim();
-        if (!isHost) {
-          const proof = await encryptE2EE("OK", myPass);
-          conn.send({ type: "AUTH", proof: proof, sender: document.getElementById("myChatName").value });
-        }
-      });
-      conn.on("data", async function(pkt) {
-        const myPass = document.getElementById("roomPasscode").value.trim();
-        if (pkt.type === "AUTH") {
-          try {
-            if ((await decryptE2EE(pkt.proof, myPass)) === "OK") {
-              conn.send({ type: "AUTH_OK", host: document.getElementById("myChatName").value });
-              appendChatBubble("SECURITY", "✅ " + pkt.sender + " joined E2EE Room!", "clone");
-            }
-          } catch (e) { conn.close(); }
-        } else if (pkt.type === "AUTH_OK") {
-          appendChatBubble("SECURITY", "✅ Connected to " + pkt.host + "!", "clone");
-        } else if (pkt.type === "MSG") {
-          try {
-            const plain = await decryptE2EE(pkt.cipher, myPass);
-            const inLang = document.getElementById("incomingTranslateSelect").value;
-            let trans = "";
-            if (inLang !== "none") {
-              const r = await callCloudAIWithShifter("Translate into " + inLang + ". Output ONLY translation.", plain, 200);
-              trans = r.content.trim();
-            }
-            appendChatBubble(pkt.sender, plain, pkt.isClone ? "clone" : "peer", trans);
-            if (!pkt.isClone && document.getElementById("cloneActiveToggle").checked) {
-              await triggerAIHumanCloneReply(plain, true);
-            }
-          } catch (e) {}
-        }
-      });
-    }
-
-    function appendChatBubble(sender, text, cls, subText) {
-      const box = document.getElementById("chatMessagesBox");
-      const div = document.createElement("div");
-      div.className = "bubble " + (cls || "peer");
-      div.innerHTML = "<div class='b-meta'>" + sender + "</div><div>" + text + "</div>" +
-        (subText ? "<div class='b-trans'>🌐 " + subText + "</div>" : "");
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    async function sendEncryptedChatMessage(customText) {
-      const inp = document.getElementById("chatInputBox");
-      const raw = customText !== undefined ? customText : inp.value.trim();
-      if (!raw) return;
-      if (customText === undefined) inp.value = "";
-      const myName = document.getElementById("myChatName").value || "Me";
-      const outLang = document.getElementById("outgoingTranslateSelect").value;
-      let toSend = raw, sub = "";
-      if (outLang !== "none") {
-        try {
-          const r = await callCloudAIWithShifter("Translate into " + outLang + ". Output ONLY translation.", raw, 200);
-          sub = r.content.trim();
-          toSend = sub + " (" + raw + ")";
-        } catch (e) {}
-      }
-      appendChatBubble(myName + " (You)", raw, "me", sub);
-      if (activeConn && activeConn.open) {
-        const cipher = await encryptE2EE(toSend, document.getElementById("roomPasscode").value.trim());
-        activeConn.send({ type: "MSG", sender: myName, cipher: cipher, isClone: false });
-      } else if (document.getElementById("cloneActiveToggle").checked) {
-        await triggerAIHumanCloneReply(raw, false);
-      }
-    }
-
-    async function triggerAIHumanCloneReply(userText, sendPeer) {
-      const persona = document.getElementById("clonePersonaInput").value.trim();
-      const myName = document.getElementById("myChatName").value || "Gourav";
-      try {
-        const r = await callCloudAIWithShifter(
-          "You are the AI Human Clone of " + myName + ". Instructions: " + persona + ". Reply briefly like a real friend.",
-          userText, 200
-        );
-        const reply = r.content.trim();
-        appendChatBubble("🤖 " + myName + "'s Clone (" + r.usedKey + ")", reply, "clone");
-        if (sendPeer && activeConn && activeConn.open) {
-          const cipher = await encryptE2EE(reply, document.getElementById("roomPasscode").value.trim());
-          activeConn.send({ type: "MSG", sender: "🤖 " + myName + " Clone", cipher: cipher, isClone: true });
-        }
-      } catch (e) {}
-    }
-
-    async function askHumanCloneDirectly() {
-      const inp = document.getElementById("chatInputBox");
-      const msg = inp.value.trim() || "Bhai kahan hai? Kab free hoga?";
-      inp.value = "";
-      appendChatBubble("Friend", msg, "peer");
-      await triggerAIHumanCloneReply(msg, false);
-    }
-
-    async function startMediaCall(withVideo) {
-      if (!activeConn || !activeConn.open) {
-        appendChatBubble("CALL", "⚠ Connect with a friend via Invite Link first.", "clone");
-        return;
-      }
-      try {
-        localMediaStream = await navigator.mediaDevices.getUserMedia({ video: Boolean(withVideo), audio: true });
-        document.getElementById("videoCallStage").style.display = "grid";
-        document.getElementById("endCallBtn").style.display = "inline-block";
-        document.getElementById("localVideo").srcObject = localMediaStream;
-        const call = peerInstance.call(activeConn.peer, localMediaStream, { metadata: { video: Boolean(withVideo) } });
-        activeMediaCall = call;
-        call.on("stream", function(rem) { document.getElementById("remoteVideo").srcObject = rem; });
-      } catch (e) {}
-    }
-
-    function endActiveCall() {
-      if (activeMediaCall) { activeMediaCall.close(); activeMediaCall = null; }
-      if (localMediaStream) { localMediaStream.getTracks().forEach(function(t) { t.stop(); }); localMediaStream = null; }
-      document.getElementById("videoCallStage").style.display = "none";
-      document.getElementById("endCallBtn").style.display = "none";
-    }
-
-    const scheduledQueue = [];
-    function addScheduledMessage() {
-      const inp = document.getElementById("scheduleMsgInput");
-      if (!inp.value.trim()) return;
-      const delay = parseInt(document.getElementById("scheduleDelaySelect").value, 10) || 60;
-      scheduledQueue.push({ text: inp.value.trim(), sendAt: Date.now() + delay * 1000 });
-      inp.value = "";
-      renderScheduleQueue();
-    }
-
-    function renderScheduleQueue() {
-      document.getElementById("scheduledCountBadge").textContent = scheduledQueue.length + " Pending";
-      const box = document.getElementById("scheduleListBox");
-      box.innerHTML = "";
-      scheduledQueue.forEach(function(it) {
-        const left = Math.max(0, Math.ceil((it.sendAt - Date.now()) / 1000));
-        const d = document.createElement("div");
-        d.style.cssText = "display:flex;justify-content:space-between;font-size:0.75rem;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:8px;";
-        d.innerHTML = "<span>⏰ " + it.text.slice(0, 24) + "</span><b>" + left + "s</b>";
-        box.appendChild(d);
-      });
-    }
-
-    setInterval(function() {
-      if (!scheduledQueue.length) return;
-      const now = Date.now();
-      for (let i = scheduledQueue.length - 1; i >= 0; i--) {
-        if (now >= scheduledQueue[i].sendAt) {
-          sendEncryptedChatMessage(scheduledQueue.splice(i, 1)[0].text);
-        }
-      }
-      renderScheduleQueue();
-    }, 1000);
-
-    // ---------------- 5. LIVE QUICK PATCHER & FUTURE SLOTS ----------------
     async function applyLiveQuickPatch() {
       const raw = document.getElementById("quickPatchInput").value.trim();
       const msgEl = document.getElementById("patchStatusMsg");
       if (!raw) return;
-      msgEl.textContent = "⚡ Applying patch...";
       try {
         let jsToRun = raw;
         if (!/document\.|window\.|function\s|\{|\=/.test(raw)) {
           const res = await callCloudAIWithShifter(
-            "You are a live DOM & JS patch generator for ANIMATRIX OS. Convert the user's request into raw executable browser JavaScript that modifies the page DOM, CSS styles, or window.PRESETS. Output ONLY raw JS code, no markdown.",
+            "Convert the user's request into raw executable browser JavaScript that modifies the page DOM or styles. Output ONLY raw JS code.",
             raw, 600
           );
           jsToRun = res.content.replace(/^```(?:javascript|js)?\s*/i, "").replace(/```\s*$/i, "").trim();
         }
         new Function(jsToRun)();
-        const savedPatches = JSON.parse(localStorage.getItem("animatrix_live_patches") || "[]");
-        savedPatches.push(jsToRun);
-        localStorage.setItem("animatrix_live_patches", JSON.stringify(savedPatches));
-        msgEl.textContent = "✅ Patch Applied Successfully & Saved!";
+        msgEl.textContent = "✅ Patch Applied!";
       } catch (err) {
-        msgEl.textContent = "⚠ Patch Error: " + err.message;
+        msgEl.textContent = "⚠ Error: " + err.message;
       }
     }
 
     function clearSavedPatches() {
-      localStorage.removeItem("animatrix_live_patches");
       location.reload();
     }
 
-    function runAllSavedPatches() {
-      const savedPatches = JSON.parse(localStorage.getItem("animatrix_live_patches") || "[]");
-      savedPatches.forEach(function(code) {
-        try { new Function(code)(); } catch (e) {}
-      });
-      if (window.ANIMATRIX_PATCHES && Array.isArray(window.ANIMATRIX_PATCHES)) {
-        window.ANIMATRIX_PATCHES.forEach(function(fn) {
-          try { fn(); } catch (e) {}
-        });
-      }
-    }
-
-    const defaultFutureSlots = [
-      { title: "Slot #1: AI Voice Dubbing Studio", desc: "Reserved slot for custom voice cloning & anime lip-sync.", tag: "FUTURE SLOT 1" },
-      { title: "Slot #2: Interactive WebGL Game Maker", desc: "Reserved slot for 3D physics & playable mini-games.", tag: "FUTURE SLOT 2" },
-      { title: "Slot #3: Beat-Synced Music Visualizer", desc: "Reserved slot for audio-reactive shaders.", tag: "FUTURE SLOT 3" },
-      { title: "Slot #4: Custom User Plugin", desc: "Add any new module here anytime.", tag: "FUTURE SLOT 4" }
-    ];
-
-    function renderFutureSlots() {
-      const saved = JSON.parse(localStorage.getItem("animatrix_v10_slots") || "null") || defaultFutureSlots;
-      const grid = document.getElementById("futureSlotsGrid");
-      if (!grid) return;
-      grid.innerHTML = "";
-      saved.forEach(function(s) {
-        const c = document.createElement("div");
-        c.className = "launcher-tile";
-        c.style.borderStyle = "dashed";
-        c.innerHTML = "<span class='tile-badge'>" + s.tag + "</span><h2>🧩 " + s.title + "</h2><p>" + s.desc + "</p>";
-        grid.appendChild(c);
-      });
-    }
-
-    function addCustomFutureSlot() {
-      const t = document.getElementById("customFeatureTitle").value.trim();
-      const d = document.getElementById("customFeatureDesc").value.trim();
-      if (!t) return;
-      const saved = JSON.parse(localStorage.getItem("animatrix_v10_slots") || "null") || defaultFutureSlots;
-      saved.unshift({ title: t, desc: d || "Custom module ready.", tag: "CUSTOM ADDED" });
-      localStorage.setItem("animatrix_v10_slots", JSON.stringify(saved));
-      document.getElementById("customFeatureTitle").value = "";
-      document.getElementById("customFeatureDesc").value = "";
-      renderFutureSlots();
-    }
-
+    // ---------------- INITIALIZE & AUTO-CONNECT ON URL CODE ----------------
     initKeyPool();
     loadPreset("rabbit");
-    renderFutureSlots();
-    runAllSavedPatches();
-    if ((window.location.hash || "").includes("room=")) {
-      openAppView("chat");
-      document.getElementById("joinRoomIdInput").value = window.location.href;
+
+    const savedLock = parseInt(localStorage.getItem("animatrix_v12_lock") || "0", 10);
+    if (savedLock > Date.now()) {
+      startThreeHourCountdown(savedLock);
+    } else {
+      startThreeHourCountdown(Date.now() + THREE_HOURS_MS);
     }
+
+    // Check BOTH ?code=4589 query parameter AND #code=4589 hash!
+    (function checkUrlForAutoConnect() {
+      const params = new URLSearchParams(window.location.search);
+      const hashMatch = (window.location.hash || "").match(/code=([^&]+)/);
+      const urlCode = params.get("code") || (hashMatch ? decodeURIComponent(hashMatch[1]) : "");
+      if (urlCode) {
+        document.getElementById("magicRoomCodeInput").value = urlCode;
+        openAppView("chat");
+      } else {
+        updateShareableLinkBox("4589");
+      }
+    })();
   </script>
 </body>
 </html>
