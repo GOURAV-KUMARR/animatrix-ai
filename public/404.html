@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>ANIMATRIX CRYSTAL OS v10.0 — 24x7 Cloud Studio & E2EE Messenger</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <style>
+    :root {
+      --bg-deep: #04050e;
+      --crystal-glass: rgba(18, 22, 44, 0.68);
+      --crystal-card: rgba(24, 29, 58, 0.74);
+      --crystal-border: rgba(255, 255, 255, 0.18);
+      --primary: #9d6cff;
+      --accent: #00f2fe;
+      --anime-pink: #ff3cac;
+      --success: #00f5a0;
+      --warning: #ffbe3d;
+      --danger: #ff416c;
+      --text: #f8faff;
+      --muted: #9aa5c4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background:
+        radial-gradient(circle at 15% 15%, rgba(157, 108, 255, 0.28), transparent 38%),
+        radial-gradient(circle at 85% 12%, rgba(0, 242, 254, 0.22), transparent 36%),
+        radial-gradient(circle at 50% 85%, rgba(255, 60, 172, 0.18), transparent 42%),
+        var(--bg-deep);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    header.app-dock {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      padding: 12px 22px; margin: 12px 16px 0; background: var(--crystal-glass);
+      backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
+      border: 1px solid var(--crystal-border); border-radius: 22px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55), inset 0 1px 1px rgba(255,255,255,0.28);
+      position: sticky; top: 10px; z-index: 100;
+    }
+    .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.05rem; cursor: pointer; }
+    .orb {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: conic-gradient(from 45deg, var(--accent), var(--primary), var(--anime-pink), var(--accent));
+      box-shadow: 0 0 18px var(--accent);
+    }
+    .dock-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap; background: rgba(5, 7, 18, 0.72);
+      padding: 5px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .dock-btn {
+      background: transparent; color: var(--muted); border: none; padding: 8px 14px;
+      border-radius: 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .dock-btn.active, .dock-btn:hover {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #04050e; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35);
+    }
+    .shifter-badge {
+      display: flex; align-items: center; gap: 8px; font-size: 0.74rem; font-weight: 800;
+      color: var(--success); background: rgba(0, 245, 160, 0.12);
+      border: 1px solid rgba(0, 245, 160, 0.4); padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); }
+
+    .app-view { display: none; padding: 18px; flex: 1; }
+    .app-view.active { display: block; }
+
+    .welcome-box { text-align: center; max-width: 820px; margin: 10px auto 24px; }
+    .welcome-box h1 {
+      font-size: 2.1rem; font-weight: 900;
+      background: linear-gradient(90deg, #fff, var(--accent), var(--anime-pink));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;
+    }
+    .welcome-box p { color: var(--muted); font-size: 0.95rem; }
+    .app-launcher-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px; max-width: 1200px; margin: 0 auto;
+    }
+    .launcher-tile {
+      background: var(--crystal-card); backdrop-filter: blur(26px);
+      border: 1.5px solid var(--crystal-border); border-radius: 24px; padding: 24px;
+      display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: all 0.25s ease;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.25);
+    }
+    .launcher-tile:hover {
+      transform: translateY(-6px); border-color: var(--accent);
+      box-shadow: 0 20px 50px rgba(0, 242, 254, 0.28);
+    }
+    .tile-top { display: flex; justify-content: space-between; align-items: center; }
+    .tile-icon {
+      font-size: 2.3rem; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
+      border-radius: 18px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    }
+    .tile-badge {
+      font-size: 0.7rem; font-weight: 800; padding: 5px 11px; border-radius: 999px;
+      background: rgba(0, 242, 254, 0.15); color: var(--accent); text-transform: uppercase;
+    }
+    .launcher-tile h2 { font-size: 1.2rem; font-weight: 800; }
+    .launcher-tile p { font-size: 0.85rem; color: var(--muted); line-height: 1.45; }
+    .tile-cta { margin-top: auto; padding-top: 8px; font-size: 0.82rem; font-weight: 800; color: var(--accent); }
+
+    .crystal-panel {
+      background: var(--crystal-card); backdrop-filter: blur(26px);
+      border: 1px solid var(--crystal-border); border-radius: 22px; padding: 18px;
+      display: flex; flex-direction: column; gap: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+    .panel-head {
+      font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--accent); display: flex; justify-content: space-between; align-items: center;
+    }
+    .studio-layout { display: grid; grid-template-columns: 395px 1fr; gap: 18px; }
+    .chat-layout { display: grid; grid-template-columns: 350px 1fr 340px; gap: 18px; }
+    @media (max-width: 1120px) { .studio-layout, .chat-layout { grid-template-columns: 1fr; } }
+    .seg-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: rgba(4, 6, 16, 0.8); padding: 5px; border-radius: 12px; }
+    .seg-row.two { grid-template-columns: 1fr 1fr; }
+    .seg-item { padding: 9px; border: none; border-radius: 9px; background: transparent; color: var(--muted); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+    .seg-item.active { background: linear-gradient(135deg, var(--primary), #5b86e5); color: #fff; }
+    label.lbl { font-size: 0.71rem; font-weight: 700; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+    textarea, input[type="text"], input[type="password"], select {
+      width: 100%; background: rgba(6, 8, 20, 0.85); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.16); border-radius: 11px; padding: 10px 12px;
+      font-family: inherit; font-size: 0.85rem; outline: none;
+    }
+    .mono-code { font-family: 'JetBrains Mono', monospace; font-size: 0.79rem; color: #9bf6ff; line-height: 1.45; }
+    .chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      background: rgba(157, 108, 255, 0.16); border: 1px solid rgba(157, 108, 255, 0.38);
+      color: var(--text); padding: 6px 11px; border-radius: 999px; font-size: 0.73rem; font-weight: 600; cursor: pointer;
+    }
+    .chip-btn:hover { background: var(--primary); }
+    .btn-main {
+      background: linear-gradient(135deg, var(--primary), var(--accent)); color: #04050e; border: none;
+      padding: 12px 16px; border-radius: 12px; font-weight: 900; font-size: 0.86rem; cursor: pointer;
+    }
+    .btn-sub {
+      background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 13px; border-radius: 10px; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-rec { background: linear-gradient(135deg, #ff3366, #ff6b3d); color: #fff; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 800; font-size: 0.81rem; cursor: pointer; }
+    .btn-play-now { background: linear-gradient(135deg, var(--success), var(--accent)); color: #04050e; border: none; padding: 9px 16px; border-radius: 10px; font-weight: 900; font-size: 0.81rem; cursor: pointer; }
+    .stage-box { position: relative; width: 100%; height: 430px; background: #03040a; border-radius: 16px; overflow: hidden; border: 2px solid rgba(0, 242, 254, 0.35); }
+    #canvas2d, #canvas3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+    #canvas3d, #masterRecordCanvas { display: none; }
+    .rec-pill { position: absolute; top: 12px; right: 14px; background: rgba(255, 35, 65, 0.94); color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 0.76rem; font-weight: 800; display: none; align-items: center; gap: 8px; z-index: 25; }
+    .bar-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+    .bar-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .alert-box { display: none; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+    .alert-err { background: rgba(255, 65, 108, 0.16); border: 1px solid var(--danger); color: #ff9fb2; }
+    .alert-ok { background: rgba(0, 245, 160, 0.15); border: 1px solid var(--success); color: #69f0ae; }
+    .player-drawer { display: none; flex-direction: column; gap: 12px; background: rgba(10, 14, 32, 0.94); border: 2px solid var(--success); border-radius: 16px; padding: 16px; }
+    video#recordedVideoPreview { width: 100%; max-height: 330px; background: #000; border-radius: 10px; }
+    .chat-feed { height: 330px; overflow-y: auto; background: rgba(4, 6, 16, 0.78); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .bubble { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 0.84rem; line-height: 1.45; }
+    .bubble.me { align-self: flex-end; background: linear-gradient(135deg, var(--primary), #5b86e5); color: #fff; }
+    .bubble.peer { align-self: flex-start; background: rgba(30, 36, 70, 0.92); border: 1px solid rgba(0, 242, 254, 0.3); }
+    .bubble.clone { align-self: flex-start; background: rgba(0, 245, 160, 0.14); border: 1px solid var(--success); }
+    .b-meta { font-size: 0.67rem; color: rgba(255,255,255,0.68); margin-bottom: 4px; font-weight: 700; }
+    .b-trans { margin-top: 5px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,0.22); font-size: 0.77rem; color: var(--accent); }
+    .call-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; background: #03040a; padding: 10px; border-radius: 14px; border: 1px solid var(--accent); }
+    .call-grid video { width: 100%; height: 180px; object-fit: cover; background: #080a18; border-radius: 10px; }
+    .timer-pill { background: rgba(255, 190, 61, 0.15); border: 1px solid var(--warning); color: var(--warning); padding: 7px 12px; border-radius: 999px; font-size: 0.74rem; font-weight: 800; text-align: center; }
+    .key-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+    .key-card { background: rgba(6, 9, 24, 0.85); border: 1px solid rgba(255,255,255,0.12); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 5px; }
+    .key-card.active-k { border-color: var(--success); box-shadow: 0 0 16px rgba(0, 245, 160, 0.25); }
+  </style>
+</head>
+<body>
+
+  <header class="app-dock">
+    <div class="brand-logo" onclick="openAppView('home')">
+      <div class="orb"></div>
+      <span>ANIMATRIX CLOUD OS v10.0</span>
+    </div>
+
+    <div class="dock-tabs">
+      <button class="dock-btn active" id="tabHome" onclick="openAppView('home')">🏠 App Home</button>
+      <button class="dock-btn" id="tab2D" onclick="openAppView('2d')">🎨 2D Animation</button>
+      <button class="dock-btn" id="tab3D" onclick="openAppView('3d')">🪐 3D Animation</button>
+      <button class="dock-btn" id="tabAnime" onclick="openAppView('anime')">🌸 Anime Studio</button>
+      <button class="dock-btn" id="tabChat" onclick="openAppView('chat')">💬 E2EE Chat & Call</button>
+      <button class="dock-btn" id="tabKeys" onclick="openAppView('keys')">🔄 Key Shifter (15+)</button>
+      <button class="dock-btn" id="tabFuture" onclick="openAppView('future')">⚡ Quick Patch & Slots</button>
+    </div>
+
+    <div class="shifter-badge" onclick="openAppView('keys')">
+      <span class="pulse-dot"></span>
+      <span id="topKeyBadge">24x7 CLOUD • KEY #1</span>
+    </div>
+  </header>
+
+  <!-- ==================== 1. FULLSCREEN APP LAUNCHER HOME SCREEN ==================== -->
+  <main class="app-view active" id="viewHome">
+    <div class="welcome-box">
+      <h1>Aaj Aapko Kya Karna Hai?</h1>
+      <p>Yeh website 24x7 GitHub Cloud Subdomain par hosted hai — Laptop band rehne par bhi aapka koi bhi dost ise kahin se bhi chala sakta hai:</p>
+    </div>
+
+    <div class="app-launcher-grid" id="mainLaunchpadGrid">
+      <div class="launcher-tile" onclick="openAppView('2d')">
+        <div class="tile-top">
+          <div class="tile-icon">🎨</div>
+          <span class="tile-badge">2D CANVAS HD</span>
+        </div>
+        <h2>2D Animation Banana Hai</h2>
+        <p>Magical Forest Rabbit, Cyberpunk GT-R Rain, ya apna khud ka Prompt/JS Code daal kar 60 FPS 2D video banayein aur MP4 mein play & save karein.</p>
+        <div class="tile-cta">Open 2D Studio &rarr;</div>
+      </div>
+
+      <div class="launcher-tile" onclick="openAppView('3d')">
+        <div class="tile-top">
+          <div class="tile-icon">🪐</div>
+          <span class="tile-badge">THREE.JS WEBGL</span>
+        </div>
+        <h2>3D Animation Banana Hai</h2>
+        <p>Gargantua 3D Black Hole Galaxy, 3D Crystal AI Core, aur interactive 3D WebGL animations banayein aur MP4/WebM mein record karein.</p>
+        <div class="tile-cta">Open 3D Studio &rarr;</div>
+      </div>
+
+      <div class="launcher-tile" onclick="openAppView('anime')">
+        <div class="tile-top">
+          <div class="tile-icon">🌸</div>
+          <span class="tile-badge">ANIME FX ENGINE</span>
+        </div>
+        <h2>Anime Banana Hai</h2>
+        <p>Sakura Samurai, Super Saiyan Energy Aura, speed-lines aur glowing anime scenes AI prompt se turant generate karein.</p>
+        <div class="tile-cta">Open Anime Studio &rarr;</div>
+      </div>
+
+      <div class="launcher-tile" onclick="openAppView('chat')">
+        <div class="tile-top">
+          <div class="tile-icon">💬</div>
+          <span class="tile-badge">E2EE + WEBRTC + AI CLONE</span>
+        </div>
+        <h2>Baat Karna Hai (Chat, Video Call & Clone)</h2>
+        <p>1/2/3 Minute Expiring Passcode Link bhejein, Voice/Video Call karein, Auto-Schedule lagayein, Hindi &harr; English Translate karein, ya AI Human Clone on rakhein.</p>
+        <div class="tile-cta">Open Secret Messenger &rarr;</div>
+      </div>
+
+      <div class="launcher-tile" onclick="openAppView('keys')">
+        <div class="tile-top">
+          <div class="tile-icon">🔄</div>
+          <span class="tile-badge">15+ API KEYS LOADED</span>
+        </div>
+        <h2>API Key Auto-Shifter (1st &rarr; 2nd &rarr; 3rd)</h2>
+        <p>Aapke 7 ChatGPT Keys, 7 Google Keys aur Groq Key automatic shift hote hain. Ek ka limit khatam hone par dusra key automatic chalega.</p>
+        <div class="tile-cta">Manage API Keys &rarr;</div>
+      </div>
+
+      <div class="launcher-tile" onclick="openAppView('future')" style="border-style:dashed;">
+        <div class="tile-top">
+          <div class="tile-icon">⚡</div>
+          <span class="tile-badge">QUICK LIVE PATCHER</span>
+        </div>
+        <h2>Quick Patch & Future Features</h2>
+        <p>Bina pura code likhe sirf 1 line ka prompt ya chhota sa JS code dekar website mein naya feature ya change turant apply karein.</p>
+        <div class="tile-cta">Open Quick Patcher &rarr;</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== 2. UNIFIED 2D / 3D / ANIME STUDIO VIEW ==================== -->
+  <main class="app-view" id="viewStudio">
+    <div class="studio-layout">
+      <section class="crystal-panel">
+        <div class="panel-head">
+          <span>🎨 2D / 3D / ANIME STUDIO</span>
+          <span id="engineBadge">2D HD</span>
+        </div>
+
+        <label class="lbl">1. SELECT ANIMATION ENGINE</label>
+        <div class="seg-row">
+          <button class="seg-item active" id="btnMode2D" onclick="setEngineMode('2D')">🎨 2D MOTION</button>
+          <button class="seg-item" id="btnMode3D" onclick="setEngineMode('3D')">🪐 3D THREE.JS</button>
+          <button class="seg-item" id="btnModeAnime" onclick="setEngineMode('ANIME')">🌸 ANIME FX</button>
+        </div>
+
+        <label class="lbl">2. CHOOSE INPUT BOX (PROMPT OR SEPARATE JS CODE)</label>
+        <div class="seg-row two">
+          <button class="seg-item active" id="btnBoxPrompt" onclick="toggleInputBox('prompt')">✨ Only Prompt Box</button>
+          <button class="seg-item" id="btnBoxCode" onclick="toggleInputBox('code')">💻 Separate JS Code Box</button>
+        </div>
+
+        <div id="boxPromptArea" style="display:flex;flex-direction:column;gap:10px;">
+          <label class="lbl">
+            <span>WRITE ANIMATION PROMPT</span>
+            <span id="charCount">0 / 2500</span>
+          </label>
+          <textarea id="promptInput" rows="4" placeholder="Describe your 2D, 3D or Anime animation here..."></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-sub" style="flex:1;" onclick="enhancePromptWithAI()">🪄 Enhance Prompt</button>
+            <button class="btn-sub" style="flex:1;" onclick="generateWithAI(true)">✨ Modify Current</button>
+          </div>
+          <button class="btn-main" id="generateBtn" onclick="generateWithAI(false)">⚡ GENERATE ANIMATION (AUTO-SHIFT KEY)</button>
+        </div>
+
+        <div id="boxCodeArea" style="display:none;flex-direction:column;gap:10px;">
+          <label class="lbl">
+            <span>PASTE YOUR OWN JAVASCRIPT CODE HERE</span>
+            <span>DIRECT JS</span>
+          </label>
+          <textarea id="directCustomCodeInput" class="mono-code" rows="7" spellcheck="false" placeholder="// Paste your custom renderFrame() or createScene() JS code here..."></textarea>
+          <button class="btn-main" onclick="runSeparateCustomCode()">▶ RUN MY CUSTOM JS CODE</button>
+        </div>
+
+        <label class="lbl">3. INSTANT STUDIO PRESETS</label>
+        <div class="chips-wrap" id="presetChipsContainer">
+          <button class="chip-btn" onclick="loadPreset('rabbit')">🐇 Magical Rabbit 2D</button>
+          <button class="chip-btn" onclick="loadPreset('cybercar')">🏎️ Cyberpunk GT-R 2D</button>
+          <button class="chip-btn" onclick="loadPreset('animeSamurai')">🌸 Sakura Samurai Anime</button>
+          <button class="chip-btn" onclick="loadPreset('animeSaiyan')">⚡ Saiyan Aura Anime</button>
+          <button class="chip-btn" onclick="loadPreset('galaxy3d')">🌌 3D Black Hole Galaxy</button>
+          <button class="chip-btn" onclick="loadPreset('crystal3d')">💎 3D Crystal Core</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="lbl">VIDEO FORMAT</label>
+            <select id="formatSelect">
+              <option value="mp4" selected>MP4 Video (.mp4)</option>
+              <option value="webm">WebM Video (.webm)</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">DURATION</label>
+            <select id="durationSelect">
+              <option value="5" selected>5 Seconds</option>
+              <option value="10">10 Seconds</option>
+              <option value="15">15 Seconds</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-direction:column;gap:16px;">
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>LIVE 1280x720 HD HARDWARE PREVIEW</span>
+            <span id="fpsCounter">60 FPS RUNNING</span>
+          </div>
+
+          <div class="stage-box" id="previewContainer">
+            <canvas id="canvas2d" width="1280" height="720"></canvas>
+            <canvas id="canvas3d" width="1280" height="720"></canvas>
+            <canvas id="masterRecordCanvas" width="1280" height="720"></canvas>
+            <div class="rec-pill" id="recIndicator">🔴 RECORDING HD <span id="recTimer">5s</span></div>
+          </div>
+
+          <div id="statusBanner" class="alert-box"></div>
+
+          <div class="bar-row">
+            <div class="bar-group">
+              <button class="btn-sub" onclick="runCurrentCode()">▶ RUN</button>
+              <button class="btn-sub" id="pauseBtn" onclick="togglePause()">⏸ PAUSE</button>
+              <button class="btn-sub" onclick="resetPreview()">↺ RESTART</button>
+              <button class="btn-sub" onclick="fullscreenPreview()">⛶ FULLSCREEN</button>
+            </div>
+            <div class="bar-group">
+              <button class="btn-play-now" id="playRecordedBtn" onclick="openAndPlayRecordedVideo()">▶ PLAY VIDEO</button>
+              <button class="btn-rec" id="exportBtn" onclick="recordAndExportVideo()">🔴 RECORD & SAVE MP4</button>
+            </div>
+          </div>
+
+          <div class="player-drawer" id="videoPlayerCard">
+            <div class="bar-row">
+              <span style="color:var(--success);font-weight:900;font-size:0.86rem;">🎬 LIVE RECORDED VIDEO PLAYER</span>
+              <button class="btn-sub" onclick="replayRecordedVideo()">▶ Replay Video</button>
+            </div>
+            <video id="recordedVideoPreview" controls playsinline autoplay loop></video>
+            <div class="bar-group">
+              <a id="downloadMp4Btn" class="btn-main" style="text-decoration:none;padding:8px 16px;" href="#" download="animatrix-video.mp4">⬇ DOWNLOAD .MP4</a>
+              <a id="downloadWebmBtn" class="btn-sub" style="text-decoration:none;padding:8px 16px;" href="#" download="animatrix-video.webm">⬇ DOWNLOAD .WEBM</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>PROFESSIONAL JAVASCRIPT ANIMATION CODE</span>
+            <div class="bar-group">
+              <button class="btn-sub" onclick="runCurrentCode()">▶ Apply Edits</button>
+              <button class="btn-sub" onclick="copyCode()">📋 Copy</button>
+              <button class="btn-sub" onclick="downloadJS()">⬇ Save .JS</button>
+            </div>
+          </div>
+          <textarea id="codeEditor" class="mono-code" rows="8" spellcheck="false"></textarea>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ==================== 3. E2EE CHAT + VIDEO CALL + AI CLONE + SCHEDULER ==================== -->
+  <main class="app-view" id="viewChat">
+    <div class="chat-layout">
+      <section class="crystal-panel">
+        <div class="panel-head">
+          <span>🔐 E2EE LINK & 1-3m PASSCODE</span>
+          <span id="peerStatusBadge" style="color:var(--success);">READY</span>
+        </div>
+
+        <label class="lbl">YOUR NAME</label>
+        <input type="text" id="myChatName" value="Gourav" />
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="lbl">SHARED PASSCODE</label>
+            <input type="text" id="roomPasscode" value="7890" />
+          </div>
+          <div>
+            <label class="lbl">PASSCODE EXPIRY</label>
+            <select id="passcodeExpirySelect">
+              <option value="1">1 Minute Only</option>
+              <option value="2" selected>2 Minutes Only</option>
+              <option value="3">3 Minutes Only</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-main" onclick="createTimeLimitedRoom()">🔗 GENERATE E2EE LINK & START TIMER</button>
+
+        <div class="timer-pill" id="passcodeTimerBadge">
+          ⏱ Passcode Timer: Click Generate Link to start 1-3m timer
+        </div>
+
+        <div id="inviteLinkBox" style="display:none;flex-direction:column;gap:6px;">
+          <label class="lbl">SEND THIS LINK TO FRIEND</label>
+          <input type="text" id="generatedInviteUrl" readonly onclick="this.select()" />
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sub" style="flex:1;" onclick="copyInviteLink()">📋 Copy Link</button>
+            <button class="btn-sub" style="flex:1;" onclick="renewPasscodeWindow()">🔄 Reset Timer</button>
+          </div>
+        </div>
+
+        <hr style="border-color:rgba(255,255,255,0.1);margin:4px 0;">
+
+        <label class="lbl">JOIN FRIEND'S LINK OR ROOM ID</label>
+        <input type="text" id="joinRoomIdInput" placeholder="Paste Friend's Link or Room ID..." />
+        <button class="btn-sub" onclick="joinRoomWithPasscode()">🔓 Verify Passcode & Connect</button>
+      </section>
+
+      <section class="crystal-panel">
+        <div class="panel-head">
+          <span>💬 AES-256 ENCRYPTED CHAT & CALL</span>
+          <div class="bar-group">
+            <button class="btn-sub" onclick="startMediaCall(false)">📞 Voice Call</button>
+            <button class="btn-sub" onclick="startMediaCall(true)">📹 Video Call</button>
+            <button class="btn-sub" id="endCallBtn" style="display:none;color:var(--danger);border-color:var(--danger);" onclick="endActiveCall()">❌ End Call</button>
+          </div>
+        </div>
+
+        <div class="call-grid" id="videoCallStage">
+          <div>
+            <small style="color:var(--muted);font-size:0.7rem;">YOU</small>
+            <video id="localVideo" autoplay muted playsinline></video>
+          </div>
+          <div>
+            <small style="color:var(--accent);font-size:0.7rem;">FRIEND</small>
+            <video id="remoteVideo" autoplay playsinline></video>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(0,242,254,0.07);padding:8px 10px;border-radius:10px;">
+          <div>
+            <label class="lbl">🌐 MY MSG AUTO-TRANSLATE</label>
+            <select id="outgoingTranslateSelect">
+              <option value="none">Send Original</option>
+              <option value="English" selected>Hindi &rarr; Send in English</option>
+              <option value="Hindi">English &rarr; Send in Hindi</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">🌐 FRIEND MSG TRANSLATE</label>
+            <select id="incomingTranslateSelect">
+              <option value="Hindi" selected>Translate to Hindi (हिंदी)</option>
+              <option value="English">Translate to English</option>
+              <option value="none">Show Original</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="chat-feed" id="chatMessagesBox">
+          <div class="bubble clone">
+            <div class="b-meta">💎 CRYSTAL E2EE MESSENGER</div>
+            Yahan se aap 1-3 minute expiring Passcode Link, Voice/Video Call, Auto-Scheduler, Hindi &harr; English Live Translation aur AI Human Clone use kar sakte hain!
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="chatInputBox" placeholder="Type message in Hindi, Hinglish or English..." onkeydown="if(event.key==='Enter') sendEncryptedChatMessage()" />
+          <button class="btn-main" onclick="sendEncryptedChatMessage()">🚀 Send</button>
+          <button class="btn-sub" onclick="askHumanCloneDirectly()">🤖 Test Clone</button>
+        </div>
+      </section>
+
+      <section style="display:flex;flex-direction:column;gap:16px;">
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>🤖 AI HUMAN CLONE (DIGITAL TWIN)</span>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="checkbox" id="cloneActiveToggle" checked />
+              <span style="color:var(--success);font-size:0.74rem;">ACTIVE</span>
+            </label>
+          </div>
+          <label class="lbl">CLONE PERSONALITY & SCHEDULE</label>
+          <textarea id="clonePersonaInput" rows="3">Main Gourav ka AI Human Clone hun. Gourav abhi busy hai aur shaam 6 baje free hoga. Doston se friendly Hinglish mein baat karo aur unka message note kar lo.</textarea>
+        </div>
+
+        <div class="crystal-panel">
+          <div class="panel-head">
+            <span>⏰ AUTO MESSAGE SCHEDULER</span>
+            <span id="scheduledCountBadge">0 Pending</span>
+          </div>
+          <input type="text" id="scheduleMsgInput" placeholder="Message to schedule..." />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <select id="scheduleDelaySelect">
+              <option value="10">After 10 Sec</option>
+              <option value="30">After 30 Sec</option>
+              <option value="60" selected>After 1 Min</option>
+              <option value="180">After 3 Min</option>
+            </select>
+            <button class="btn-main" style="padding:8px;" onclick="addScheduledMessage()">⏰ Schedule</button>
+          </div>
+          <div id="scheduleListBox" style="display:flex;flex-direction:column;gap:5px;max-height:110px;overflow-y:auto;"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ==================== 4. API KEY AUTO-SHIFTER VIEW ==================== -->
+  <main class="app-view" id="viewKeys">
+    <div class="crystal-panel" style="max-width:1120px;margin:0 auto;">
+      <div class="panel-head">
+        <span>🔄 MULTI-API KEY AUTO-SHIFTER (1st &rarr; 2nd &rarr; 3rd AUTOMATIC ROTATION)</span>
+        <button class="btn-sub" onclick="manualShiftNextKey()">⏭ Force Shift Next Key</button>
+      </div>
+      <p style="font-size:0.85rem;color:var(--muted);">
+        Aapke diye gaye <b>7 ChatGPT Keys</b>, <b>7 Google Keys</b> aur <b>Groq Key</b> yahan pre-loaded hain. Har task ke baad ya kisi key ka limit khatam hone par system automatic agli key par shift ho jata hai:
+      </p>
+
+      <div style="display:grid;grid-template-columns:160px 1fr 180px;gap:10px;background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
+        <select id="newKeyProviderSelect">
+          <option value="openai">ChatGPT / OpenAI</option>
+          <option value="groq">Groq API</option>
+          <option value="google">Google Gemini</option>
+        </select>
+        <input type="password" id="newKeyValueInput" placeholder="Paste additional API Key here..." />
+        <button class="btn-main" onclick="addNewApiKeyFromUI()">➕ Add Key</button>
+      </div>
+
+      <div class="key-grid" id="keyPoolGrid"></div>
+    </div>
+  </main>
+
+  <!-- ==================== 5. QUICK LIVE PATCHER & FUTURE EXPANSION SLOTS ==================== -->
+  <main class="app-view" id="viewFuture">
+    <div class="crystal-panel" style="max-width:1120px;margin:0 auto;">
+      <div class="panel-head">
+        <span>⚡ QUICK CODE / AI PATCHER (BINA PURA CODE LIKHE CHANGES KAREIN)</span>
+        <span>INSTANT LIVE UPDATE</span>
+      </div>
+      <p style="font-size:0.85rem;color:var(--muted);">
+        Agar aapko website mein koi naya change karna hai, naya button lagana hai, ya chhota sa JS code/instruction dena hai, toh bas niche likhein — pura code dubara likhne ki zaroorat nahi hai:
+      </p>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:10px;background:rgba(0,242,254,0.06);padding:14px;border-radius:14px;border:1px solid rgba(0,242,254,0.25);">
+        <label class="lbl">DESCRIBE CHANGE IN HINDI/ENGLISH OR PASTE SMALL JS PATCH</label>
+        <textarea id="quickPatchInput" class="mono-code" rows="4" placeholder="Example: 'Website ka background color neon purple kar do' YA seedha 2-line JS code dalein..."></textarea>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-main" style="flex:1;" onclick="applyLiveQuickPatch()">⚡ Apply Change to Website Now</button>
+          <button class="btn-sub" onclick="clearSavedPatches()">↺ Reset All Patches</button>
+        </div>
+        <div id="patchStatusMsg" style="font-size:0.8rem;color:var(--success);"></div>
+      </div>
+
+      <hr style="border-color:rgba(255,255,255,0.1);margin:6px 0;">
+
+      <div class="panel-head">
+        <span>🧩 ADD NEW FEATURE CARD TO LAUNCHPAD</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 2fr 160px;gap:10px;background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
+        <input type="text" id="customFeatureTitle" placeholder="New Feature Name..." />
+        <input type="text" id="customFeatureDesc" placeholder="Feature Description..." />
+        <button class="btn-main" onclick="addCustomFutureSlot()">🚀 Add Feature</button>
+      </div>
+      <div class="app-launcher-grid" id="futureSlotsGrid" style="margin-top:12px;"></div>
+    </div>
+  </main>
+
+  <script src="plugins.js"></script>
+  <script>
+    const PRELOADED_ENCRYPTED_POOL = [{"id":"Groq-Primary-Key","provider":"groq","token":"JCEyDDc2PBUgZ0YsESc1HSIoNzAIP3sKCHVUS1RwFAAADDY1OS5kVi8RDzVmNBQ6DQh8ICo8YVo="},{"id":"ChatGPT-Key-1","provider":"openai","token":"MDl0IyYuJnIyen4pIj56OnIFIn4kD2EABmhKZ3slChhjAigkDAdcYRgWfwklLTYecAB8BRNmU0hQBhwLaxEhFRlsHQhaJxUfOgY8ECI8KyQCcQsBcl5UKBQTYmZ2HAgAfFYPGQ4OLBEpOCc+NA4yal8IUHx7GAwLHC8nKSJgaSs3CRwABRcVMn81JQ9pAWdlYBckNgE5dXsQPURlaHc8PXh0bxI="},{"id":"ChatGPT-Key-2","provider":"openai","token":"MDl0IyYuJnIEW0ZrExx9IQJmPC0AHTonCn9IX0Q2GGkeYHUBEiBJdBMVKwcTNzsXIC0tFRE2ZwlxbiExb2oLE3loZgl1NQAWABMOGR1/GhwkLQsBcl5UKBQTZRh1KhUiSHUlGRo7OA4WIBs6MigGOmN3cH8yMQAfYTkhCA91fREzIAsAdikBGHApCj4ndwJrB3YqPj8FLHo2HgFYaxICAh4dHhI="},{"id":"ChatGPT-Key-3","provider":"openai","token":"MDl0IyYuJnIfR0gWdwp7AwoeNQcrEyIPN3EDS0I1Cxs/IBMjKAdCQw8TOXkWKAxmOiRxPB0ocGpVWg8CDD8kCQFqJklqbgQiBQotKwU/IBMmCgsBcl5UKBQTJWwYGxgvW0I+GgsfEgBuGS4YKQIoGmoDUwArJTohGxEGKyN8fzEINRsSAD4dBngRFBQ9WER5DnAaFWo+FCgnIUgDNicGNnhyBhI="},{"id":"ChatGPT-Key-4","provider":"openai","token":"MDl0IyYuJnI7ZAQmJxguMAMHACRxLCYwMmJKXFIVFQwZLiAOCAZySBosYSslDRA8EQRxJjIOQ1ZbTm4BHBsVdj5oNVNoGRUICxQePAY7BD17MwsBcl5UKBQTODJ4YTsxfwQLDgAQJxEcJngQJi0MGwdBS0whaigJJg4AFhNFZQ50PDg9IQY0BQskGRIVaFZYTCowGgM2bDQYI3NnEQ0WJyIrHhI="},{"id":"ChatGPT-Key-5","provider":"openai","token":"MDl0IyYuJnJvUkU+MHsmAggIPis9BwMuMldyXkctN2FhOgUfGj53bzxuICIiHW8MAicJGggdU0drYxwYPgRnBisALF9FBQs/IBMTCTd6KgYHNAsBcl5UKBQTFxEbHS4wclwPNHwBHA8oOgsjHXQCb15kU3MoHg8QGnUVGANBRgUNDSIvcQ0hCSEVHHVmVlFjDzoLNGV5MAMJA0tECAojfxoyHhI="},{"id":"ChatGPT-Key-6","provider":"openai","token":"MDl0IyYuJnJhV1gScw83NCsyBRszDAccZ0VJRXQmF3Q3B3M8FwIIXwgOEyoUKTdmMAMIKXIHYnF5YA4bbz5td306GVlgFyAoEAoyMT0lJi0iFgsBcl5UKBQTNgETBg4wYlgzDTUqYyoVYws4CCsGJnhSSwAzAS0lZTd1PDUHXwABLz4UKjU6GD8DLTMIdXxDZycGMgYVDiY9GgVgCDIpCxt2DhI="},{"id":"ChatGPT-Key-7","provider":"openai","token":"MDl0IyYuJnI4BnwrMyk1MQYNNAUDCS9wEl5yAG8HKhgDOwAkPiF6SGstFCwCKwAqOCd9IhsUWEV6WBxjYDIwHgo+AkJjNnIIHzc3PQsyPz8pFAsBcl5UKBQTOAUZCT0va3g7NComJ3EROAcMCRUjKGV2eFozEW0ZZSY8OTBmeTFwJyYnAz0nfXgRJAksWmB6ZHAgNCBtAiY7JwVYJXo4DBYWHhI="},{"id":"Google-Key-1","provider":"google","token":"AgN3EjZ5HhFgenYVGwEOBQoFPBIHDTYJLVAEX1oUCwg9Ii0dEhcHYzYyCz0BABkxfT8aJCM="},{"id":"Google-Key-2","provider":"google","token":"AgN3EjZ5HhFgelQQCToDHWlmKgR/CyMmaEpWC28EPGk2JSgVZgNQZzAtKjwZczogKj8mIxU="},{"id":"Google-Key-3","provider":"google","token":"AgN3EjZ5HhFgeFkyIXwDGw8UPwI9NwsmKHpgfkANIAAGIw4kaT1iUS50fzkwIxkkPXoIeDM="},{"id":"Google-Key-4","provider":"google","token":"AgN3EjZ5HhFgfWAQBAQnICprOQAGABk+aHxHWAEEYB1nbHI5MDRWZT0QIngsFBMXBx8CGAU="},{"id":"Google-Key-5","provider":"google","token":"AgN3EjZ5HhFgeldvcDx+HS49MiE/DXoHBXkdBwd6ZC8nGQt5ByVzUQc3AnljAGY2JDoEBSM="},{"id":"Google-Key-6","provider":"google","token":"AgN3EjZ5HhFgfUY4biEmHDEnOhciJBQgD0Rydw4EE20iDhl5HmdkZzgkIzghdScVcDxoeRU="},{"id":"Google-Key-7","provider":"google","token":"AgN3EjZ5HhFgekA+CSgqHSMFMCkiKTUbOmB3c1sGBCAQbQI0HmB0X2kxIBs2Kzc+An8kCCM="}];
+    let currentMode = "2D";
+    let isPaused = false;
+    let startTime = performance.now();
+    let active2DFn = null;
+    let active3DUpdate = null;
+    let threeScene = null, threeCamera = null, threeRenderer = null;
+
+    // ---------------- 1. 15+ API KEY AUTO-SHIFTER ENGINE ----------------
+    let keyPool = [];
+    let currentKeyIndex = 0;
+
+    function initKeyPool() {
+      const mask = "CRYSTAL_V10_CLOUD_SHIELD_2026";
+      function dec(b64) {
+        if (!b64) return "";
+        const raw = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
+        let out = "";
+        for (let i = 0; i < raw.length; i++) {
+          out += String.fromCharCode(raw[i] ^ mask.charCodeAt(i % mask.length));
+        }
+        return out.trim();
+      }
+      keyPool = (PRELOADED_ENCRYPTED_POOL || []).map(function(item) {
+        return {
+          id: item.id,
+          provider: item.provider,
+          key: dec(item.token),
+          uses: 0,
+          status: "READY"
+        };
+      }).filter(function(k) { return k.key && k.key.length > 8; });
+
+      const savedCustom = JSON.parse(localStorage.getItem("animatrix_v10_keys") || "[]");
+      savedCustom.forEach(function(ck) { keyPool.unshift(ck); });
+
+      keyPool.push({
+        id: "Unlimited-Cloud-Backup",
+        provider: "pollinations",
+        key: "always-on",
+        uses: 0,
+        status: "BACKUP READY"
+      });
+      updateKeyShifterUI();
+    }
+
+    function updateKeyShifterUI() {
+      if (!keyPool.length) return;
+      const active = keyPool[currentKeyIndex % keyPool.length];
+      const badge = document.getElementById("topKeyBadge");
+      if (badge && active) {
+        badge.textContent = "🔄 KEY #" + ((currentKeyIndex % keyPool.length) + 1) + "/" + keyPool.length + " (" + active.id + ")";
+      }
+      const grid = document.getElementById("keyPoolGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      keyPool.forEach(function(k, idx) {
+        const isCurr = idx === (currentKeyIndex % keyPool.length);
+        const masked = k.key.length > 12 ? k.key.slice(0, 7) + "••••••••" + k.key.slice(-4) : "••••••••";
+        const d = document.createElement("div");
+        d.className = "key-card" + (isCurr ? " active-k" : "");
+        d.innerHTML =
+          "<div style='display:flex;justify-content:space-between;font-size:0.75rem;font-weight:800;'>" +
+            "<span style='color:var(--accent);'>#" + (idx + 1) + " " + k.id + "</span>" +
+            "<span style='color:" + (isCurr ? "var(--success)" : "var(--muted)") + ";'>" + (isCurr ? "⚡ ACTIVE" : k.status) + "</span>" +
+          "</div>" +
+          "<div class='mono-code' style='font-size:0.72rem;color:var(--muted);'>" + masked + "</div>" +
+          "<div style='font-size:0.7rem;color:var(--muted);'>Provider: " + k.provider.toUpperCase() + " • Shifts: " + k.uses + "</div>";
+        grid.appendChild(d);
+      });
+    }
+
+    function manualShiftNextKey() {
+      currentKeyIndex = (currentKeyIndex + 1) % keyPool.length;
+      updateKeyShifterUI();
+    }
+
+    function addNewApiKeyFromUI() {
+      const prov = document.getElementById("newKeyProviderSelect").value;
+      const val = document.getElementById("newKeyValueInput").value.trim();
+      if (!val) return;
+      const entry = { id: prov.toUpperCase() + "-Added-" + (keyPool.length + 1), provider: prov, key: val, uses: 0, status: "READY" };
+      keyPool.unshift(entry);
+      currentKeyIndex = 0;
+      const saved = JSON.parse(localStorage.getItem("animatrix_v10_keys") || "[]");
+      saved.push(entry);
+      localStorage.setItem("animatrix_v10_keys", JSON.stringify(saved));
+      document.getElementById("newKeyValueInput").value = "";
+      updateKeyShifterUI();
+    }
+
+    async function callCloudAIWithShifter(sysPrompt, userContent, maxTokens) {
+      if (!keyPool.length) initKeyPool();
+      const total = keyPool.length;
+      let lastErr = "All keys busy";
+
+      for (let attempt = 0; attempt < total; attempt++) {
+        const idx = (currentKeyIndex + attempt) % total;
+        const kObj = keyPool[idx];
+        try {
+          let text = "";
+          if (kObj.provider === "groq") {
+            const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + kObj.key },
+              body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                temperature: 0.45,
+                max_tokens: maxTokens || 3200,
+                messages: [{ role: "system", content: sysPrompt }, { role: "user", content: userContent }]
+              })
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error((d.error && d.error.message) || "Groq limit");
+            text = d.choices[0].message.content;
+          } else if (kObj.provider === "openai") {
+            const r = await fetch("https://api.openai.com/v1/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + kObj.key },
+              body: JSON.stringify({
+                model: "gpt-4o-mini",
+                temperature: 0.45,
+                max_tokens: maxTokens || 3200,
+                messages: [{ role: "system", content: sysPrompt }, { role: "user", content: userContent }]
+              })
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error((d.error && d.error.message) || "OpenAI limit");
+            text = d.choices[0].message.content;
+          } else if (kObj.provider === "google") {
+            const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(kObj.key), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contents: [{ parts: [{ text: sysPrompt + "\n\n" + userContent }] }] })
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error("Google API limit");
+            text = d.candidates[0].content.parts[0].text;
+          } else {
+            const r = await fetch("https://text.pollinations.ai/openai", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model: "openai",
+                messages: [{ role: "system", content: sysPrompt }, { role: "user", content: userContent }]
+              })
+            });
+            const d = await r.json();
+            text = d.choices[0].message.content;
+          }
+
+          if (text) {
+            kObj.uses++;
+            kObj.status = "OK (SHIFTED)";
+            currentKeyIndex = (idx + 1) % total;
+            updateKeyShifterUI();
+            return { content: text, usedKey: kObj.id };
+          }
+        } catch (err) {
+          kObj.status = "SHIFTED NEXT";
+          lastErr = err.message;
+          continue;
+        }
+      }
+      throw new Error(lastErr);
+    }
+
+    // ---------------- 2. APP NAVIGATION ROUTER ----------------
+    function openAppView(target) {
+      const mapTab = { home: "tabHome", "2d": "tab2D", "3d": "tab3D", anime: "tabAnime", chat: "tabChat", keys: "tabKeys", future: "tabFuture" };
+      Object.keys(mapTab).forEach(function(k) {
+        const el = document.getElementById(mapTab[k]);
+        if (el) el.classList.toggle("active", k === target);
+      });
+
+      const viewMap = {
+        home: "viewHome",
+        "2d": "viewStudio",
+        "3d": "viewStudio",
+        anime: "viewStudio",
+        chat: "viewChat",
+        keys: "viewKeys",
+        future: "viewFuture"
+      };
+      ["viewHome", "viewStudio", "viewChat", "viewKeys", "viewFuture"].forEach(function(vid) {
+        document.getElementById(vid).classList.toggle("active", vid === viewMap[target]);
+      });
+
+      if (target === "2d") {
+        loadPreset("rabbit");
+        setEngineMode("2D");
+      } else if (target === "3d") {
+        loadPreset("galaxy3d");
+        setEngineMode("3D");
+      } else if (target === "anime") {
+        loadPreset("animeSamurai");
+        setEngineMode("ANIME");
+      } else if (target === "keys") {
+        updateKeyShifterUI();
+      } else if (target === "future") {
+        renderFutureSlots();
+      }
+    }
+
+    // ---------------- 3. STUDIO PRESETS & ENGINE ----------------
+    const canvas2d = document.getElementById("canvas2d");
+    const ctx2d = canvas2d.getContext("2d");
+    const canvas3d = document.getElementById("canvas3d");
+    const masterRecordCanvas = document.getElementById("masterRecordCanvas");
+    const masterRecordCtx = masterRecordCanvas.getContext("2d");
+
+    window.PRESETS = {
+      rabbit: {
+        mode: "2D",
+        prompt: "Cinematic 2D animation of a glowing white rabbit in an enchanted bioluminescent forest with volumetric god-rays, a shimmering river reflection, a blooming golden lotus, and swirling fireflies.",
+        code: [
+          "function renderFrame(ctx, width, height, t) {",
+          "  const horizon = height * 0.72;",
+          "  const sky = ctx.createLinearGradient(0, 0, 0, horizon);",
+          "  sky.addColorStop(0, '#030511'); sky.addColorStop(0.5, '#0d1b3e'); sky.addColorStop(1, '#103c42');",
+          "  ctx.fillStyle = sky; ctx.fillRect(0, 0, width, horizon);",
+          "  const moonX = width * 0.78, moonY = height * 0.2;",
+          "  ctx.save(); ctx.fillStyle = '#fffce6'; ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = 65;",
+          "  ctx.beginPath(); ctx.arc(moonX, moonY, 54, 0, Math.PI * 2); ctx.fill(); ctx.restore();",
+          "  for (let i = 0; i < 12; i++) {",
+          "    const tx = ((i * 150) - t * 24 + width * 2) % width, th = 220 + (i % 3) * 40;",
+          "    ctx.fillStyle = '#071126'; ctx.fillRect(tx, horizon - th, 26, th);",
+          "    ctx.beginPath(); ctx.arc(tx + 13, horizon - th, 72, 0, Math.PI * 2);",
+          "    ctx.fillStyle = 'rgba(0, 245, 160, 0.22)'; ctx.fill();",
+          "  }",
+          "  ctx.fillStyle = '#061d26'; ctx.fillRect(0, horizon, width, height - horizon);",
+          "  const cycle = t % 10, walkP = Math.min(cycle / 4.5, 1);",
+          "  const rx = width * 0.2 + walkP * (width * 0.34), hop = Math.abs(Math.sin(t * 9)) * 30;",
+          "  ctx.save(); ctx.translate(rx, horizon - 28 - hop);",
+          "  ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = 20; ctx.fillStyle = '#ffffff';",
+          "  ctx.beginPath(); ctx.ellipse(0, 0, 38, 28, 0, 0, Math.PI * 2); ctx.fill();",
+          "  ctx.beginPath(); ctx.arc(28, -22, 23, 0, Math.PI * 2); ctx.fill();",
+          "  ctx.beginPath(); ctx.ellipse(22, -55, 7, 22, 0, 0, Math.PI * 2); ctx.fill();",
+          "  ctx.restore();",
+          "  for (let f = 0; f < 42; f++) {",
+          "    const px = (f * 97 + t * 50) % width, py = (f * 67 + Math.sin(t * 2 + f) * 50 + horizon) % horizon;",
+          "    ctx.fillStyle = f % 2 === 0 ? '#ffd700' : '#00f2fe';",
+          "    ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI * 2); ctx.fill();",
+          "  }",
+          "}"
+        ].join("\n")
+      },
+      cybercar: {
+        mode: "2D",
+        prompt: "Cyberpunk GT-R sports car speeding through neon rain with wet road reflections and synthwave sun.",
+        code: [
+          "function renderFrame(ctx, width, height, t) {",
+          "  const horizon = height * 0.54;",
+          "  const sky = ctx.createLinearGradient(0, 0, 0, horizon);",
+          "  sky.addColorStop(0, '#040210'); sky.addColorStop(1, '#ff1e62');",
+          "  ctx.fillStyle = sky; ctx.fillRect(0, 0, width, horizon);",
+          "  ctx.fillStyle = '#070414'; ctx.fillRect(0, horizon, width, height - horizon);",
+          "  ctx.strokeStyle = '#00f2fe'; ctx.lineWidth = 2;",
+          "  for (let i = -12; i <= 12; i++) {",
+          "    ctx.beginPath(); ctx.moveTo(width / 2 + i * 24, horizon); ctx.lineTo(width / 2 + i * 175, height); ctx.stroke();",
+          "  }",
+          "  const cx = width / 2 + Math.sin(t * 2.2) * 55, cy = height * 0.79;",
+          "  ctx.save(); ctx.translate(cx, cy);",
+          "  ctx.fillStyle = '#111024'; ctx.strokeStyle = '#9d6cff'; ctx.lineWidth = 3;",
+          "  ctx.fillRect(-95, -25, 190, 50); ctx.strokeRect(-95, -25, 190, 50);",
+          "  ctx.fillStyle = '#ff0044'; ctx.shadowColor = '#ff0044'; ctx.shadowBlur = 25;",
+          "  [-70, -45, 45, 70].forEach(function(x) { ctx.beginPath(); ctx.arc(x, 0, 10, 0, Math.PI * 2); ctx.fill(); });",
+          "  ctx.restore();",
+          "}"
+        ].join("\n")
+      },
+      animeSamurai: {
+        mode: "ANIME",
+        prompt: "Anime Samurai warrior standing on a cliff under a giant crimson blood moon with glowing pink Sakura cherry blossom petals and lightning katana slash.",
+        code: [
+          "function renderFrame(ctx, width, height, t) {",
+          "  const sky = ctx.createLinearGradient(0, 0, 0, height);",
+          "  sky.addColorStop(0, '#090418'); sky.addColorStop(0.55, '#2c0b3f'); sky.addColorStop(1, '#12051f');",
+          "  ctx.fillStyle = sky; ctx.fillRect(0, 0, width, height);",
+          "  const mx = width * 0.72, my = height * 0.34;",
+          "  const moonG = ctx.createRadialGradient(mx, my, 20, mx, my, 165);",
+          "  moonG.addColorStop(0, '#fff0f6'); moonG.addColorStop(0.5, '#ff3cac'); moonG.addColorStop(1, 'rgba(255,60,172,0)');",
+          "  ctx.fillStyle = moonG; ctx.beginPath(); ctx.arc(mx, my, 165, 0, Math.PI * 2); ctx.fill();",
+          "  ctx.fillStyle = '#06030d'; ctx.beginPath();",
+          "  ctx.moveTo(0, height); ctx.lineTo(0, height * 0.68); ctx.lineTo(width * 0.48, height * 0.63); ctx.lineTo(width * 0.58, height); ctx.fill();",
+          "  const sx = width * 0.34, sy = height * 0.63;",
+          "  ctx.save(); ctx.translate(sx, sy);",
+          "  ctx.fillStyle = '#ff1e56'; ctx.beginPath(); ctx.moveTo(-10, -85);",
+          "  ctx.quadraticCurveTo(-95 - Math.sin(t * 9) * 25, -60, -135, -15); ctx.lineTo(-20, -30); ctx.fill();",
+          "  ctx.fillStyle = '#090614'; ctx.fillRect(-16, -92, 32, 92); ctx.beginPath(); ctx.arc(0, -108, 16, 0, Math.PI * 2); ctx.fill();",
+          "  ctx.strokeStyle = '#00f2fe'; ctx.shadowColor = '#00f2fe'; ctx.shadowBlur = 28; ctx.lineWidth = 4;",
+          "  ctx.beginPath(); ctx.moveTo(12, -58); ctx.lineTo(118, -115 + Math.sin(t * 6) * 8); ctx.stroke();",
+          "  ctx.restore();",
+          "  for (let i = 0; i < 55; i++) {",
+          "    const px = (i * 97 + t * 110) % width, py = (i * 63 + t * 55 + Math.sin(t * 3 + i) * 35) % height;",
+          "    ctx.save(); ctx.translate(px, py); ctx.rotate(t * 2 + i);",
+          "    ctx.fillStyle = i % 2 === 0 ? '#ff85c0' : '#ffd6e7';",
+          "    ctx.beginPath(); ctx.ellipse(0, 0, 7, 3.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();",
+          "  }",
+          "}"
+        ].join("\n")
+      },
+      animeSaiyan: {
+        mode: "ANIME",
+        prompt: "Super Saiyan Anime energy aura burst with rising golden-blue plasma flames and levitating rocks.",
+        code: [
+          "function renderFrame(ctx, width, height, t) {",
+          "  ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, width, height);",
+          "  const cx = width / 2, cy = height * 0.62;",
+          "  for (let a = 5; a >= 1; a--) {",
+          "    const rad = a * 55 + Math.sin(t * 14 + a) * 18;",
+          "    const g = ctx.createRadialGradient(cx, cy - 40, 10, cx, cy - 40, rad);",
+          "    g.addColorStop(0, '#ffffff'); g.addColorStop(0.4, '#00f2fe'); g.addColorStop(1, 'rgba(0,0,0,0)');",
+          "    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(cx, cy - 40, rad * 0.75, rad * 1.35, 0, 0, Math.PI * 2); ctx.fill();",
+          "  }",
+          "  ctx.fillStyle = '#090b1f'; ctx.fillRect(cx - 18, cy - 90, 36, 95);",
+          "  ctx.beginPath(); ctx.arc(cx, cy - 112, 18, 0, Math.PI * 2); ctx.fill();",
+          "}"
+        ].join("\n")
+      },
+      galaxy3d: {
+        mode: "3D",
+        prompt: "3D Gargantua Black Hole & Spiral Supernova Galaxy with 1800 glowing accretion disk stars.",
+        code: [
+          "function createScene(THREE, scene, camera, renderer) {",
+          "  scene.background = new THREE.Color(0x04050e);",
+          "  camera.position.set(0, 2.2, 6.2); camera.lookAt(0, 0, 0);",
+          "  scene.add(new THREE.AmbientLight(0xffffff, 0.8));",
+          "  const core = new THREE.Mesh(new THREE.SphereGeometry(1.1, 48, 48), new THREE.MeshBasicMaterial({ color: 0x000000 }));",
+          "  scene.add(core);",
+          "  const halo = new THREE.Mesh(new THREE.TorusGeometry(1.22, 0.06, 24, 120), new THREE.MeshBasicMaterial({ color: 0x00f2fe }));",
+          "  scene.add(halo);",
+          "  const count = 1800, geo = new THREE.BufferGeometry(), pos = new Float32Array(count * 3), col = new Float32Array(count * 3);",
+          "  for (let i = 0; i < count; i++) {",
+          "    const r = 1.45 + Math.pow(Math.random(), 1.5) * 4.2, ang = Math.random() * Math.PI * 2;",
+          "    pos[i * 3] = Math.cos(ang) * r; pos[i * 3 + 1] = (Math.random() - 0.5) * 0.22; pos[i * 3 + 2] = Math.sin(ang) * r;",
+          "    col[i * 3] = 0.5; col[i * 3 + 1] = 0.8; col[i * 3 + 2] = 1.0;",
+          "  }",
+          "  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));",
+          "  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));",
+          "  const disk = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.055, vertexColors: true }));",
+          "  scene.add(disk);",
+          "  return function update(t) { disk.rotation.y = t * 0.55; halo.rotation.z = t * 0.8; };",
+          "}"
+        ].join("\n")
+      },
+      crystal3d: {
+        mode: "3D",
+        prompt: "3D Crystal AI Core with multi-axis gyroscope rings.",
+        code: [
+          "function createScene(THREE, scene, camera, renderer) {",
+          "  scene.background = new THREE.Color(0x050611); camera.position.set(0, 0, 5.5);",
+          "  scene.add(new THREE.AmbientLight(0xffffff, 0.9));",
+          "  const l1 = new THREE.PointLight(0x00f2fe, 3.5, 30); l1.position.set(4, 4, 4); scene.add(l1);",
+          "  const crystal = new THREE.Mesh(new THREE.IcosahedronGeometry(1.3, 0), new THREE.MeshStandardMaterial({ color: 0x9d6cff, roughness: 0.1, metalness: 0.85 }));",
+          "  scene.add(crystal);",
+          "  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.04, 16, 120), new THREE.MeshBasicMaterial({ color: 0x00f2fe }));",
+          "  scene.add(ring);",
+          "  return function update(t) { crystal.rotation.x = t * 0.7; crystal.rotation.y = t * 0.9; ring.rotation.x = t * 0.8; };",
+          "}"
+        ].join("\n")
+      }
+    };
+
+    const promptInput = document.getElementById("promptInput");
+    const charCount = document.getElementById("charCount");
+    const codeEditor = document.getElementById("codeEditor");
+    const statusBanner = document.getElementById("statusBanner");
+
+    promptInput.addEventListener("input", function() {
+      charCount.textContent = promptInput.value.length + " / 2500";
+    });
+
+    function showBanner(msg, isError) {
+      if (!msg) { statusBanner.style.display = "none"; return; }
+      statusBanner.style.display = "block";
+      statusBanner.className = "alert-box " + (isError ? "alert-err" : "alert-ok");
+      statusBanner.textContent = (isError ? "⚠ " : "✅ ") + msg;
+    }
+
+    function setEngineMode(mode) {
+      currentMode = mode;
+      document.getElementById("btnMode2D").classList.toggle("active", mode === "2D");
+      document.getElementById("btnMode3D").classList.toggle("active", mode === "3D");
+      document.getElementById("btnModeAnime").classList.toggle("active", mode === "ANIME");
+      document.getElementById("engineBadge").textContent = mode + " HD ENGINE";
+      canvas2d.style.display = (mode === "2D" || mode === "ANIME") ? "block" : "none";
+      canvas3d.style.display = mode === "3D" ? "block" : "none";
+    }
+
+    function toggleInputBox(type) {
+      const isP = type === "prompt";
+      document.getElementById("btnBoxPrompt").classList.toggle("active", isP);
+      document.getElementById("btnBoxCode").classList.toggle("active", !isP);
+      document.getElementById("boxPromptArea").style.display = isP ? "flex" : "none";
+      document.getElementById("boxCodeArea").style.display = isP ? "none" : "flex";
+    }
+
+    function runSeparateCustomCode() {
+      const code = document.getElementById("directCustomCodeInput").value.trim();
+      if (!code) { showBanner("Paste your JS code first!", true); return; }
+      if (/createScene|new\s+THREE\./.test(code)) setEngineMode("3D");
+      else if (currentMode === "3D") setEngineMode("2D");
+      codeEditor.value = healJavaScriptCode(code, currentMode);
+      runCurrentCode();
+      showBanner("Custom JS Code Running on Live Canvas!", false);
+    }
+
+    function loadPreset(key) {
+      const p = window.PRESETS[key];
+      if (!p) return;
+      setEngineMode(p.mode);
+      promptInput.value = p.prompt;
+      charCount.textContent = p.prompt.length + " / 2500";
+      codeEditor.value = p.code;
+      document.getElementById("directCustomCodeInput").value = p.code;
+      runCurrentCode();
+    }
+
+    function healJavaScriptCode(rawText, mode) {
+      let code = String(rawText || "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+      const fence = code.match(/```(?:javascript|js)?\s*([\s\S]*?)```/i);
+      if (fence) code = fence[1].trim();
+      code = code.replace(/^```(?:javascript|js)?\s*/i, "").replace(/```\s*$/i, "").trim();
+
+      let openB = 0;
+      for (let i = 0; i < code.length; i++) {
+        if (code[i] === "{") openB++;
+        else if (code[i] === "}") openB = Math.max(0, openB - 1);
+      }
+      while (openB > 0) { code += "\n}"; openB--; }
+
+      if (mode === "3D") {
+        if (!/function\s+createScene\s*\(/.test(code)) {
+          code = "function createScene(THREE, scene, camera, renderer) {\n" + code + "\nreturn function(t){};\n}";
+        }
+      } else {
+        if (!/function\s+renderFrame\s*\(/.test(code)) {
+          code = "function renderFrame(ctx, width, height, t) {\n" + code + "\n}";
+        }
+      }
+      return code;
+    }
+
+    function runCurrentCode() {
+      showBanner("", false);
+      const healed = healJavaScriptCode(codeEditor.value, currentMode);
+      codeEditor.value = healed;
+      startTime = performance.now();
+
+      if (currentMode === "2D" || currentMode === "ANIME") {
+        try {
+          const fn = new Function(healed + "\nreturn renderFrame;")();
+          fn(ctx2d, canvas2d.width, canvas2d.height, 0.1);
+          active2DFn = fn;
+        } catch (err) {
+          showBanner("Syntax Repaired (" + err.message + ")", true);
+          active2DFn = new Function(window.PRESETS.rabbit.code + "\nreturn renderFrame;")();
+        }
+      } else {
+        try {
+          if (!threeRenderer) {
+            threeRenderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, preserveDrawingBuffer: true });
+          }
+          threeRenderer.setSize(canvas3d.width, canvas3d.height, false);
+          threeScene = new THREE.Scene();
+          threeCamera = new THREE.PerspectiveCamera(60, canvas3d.width / canvas3d.height, 0.1, 1000);
+          const factory3d = new Function("THREE", "scene", "camera", "renderer", healed + "\nreturn createScene(THREE, scene, camera, renderer);");
+          active3DUpdate = factory3d(THREE, threeScene, threeCamera, threeRenderer);
+        } catch (err) {
+          showBanner("3D Scene Repaired: " + err.message, true);
+        }
+      }
+    }
+
+    function masterAnimationLoop(now) {
+      requestAnimationFrame(masterAnimationLoop);
+      if (isPaused) return;
+      const elapsed = (now - startTime) / 1000;
+      try {
+        if ((currentMode === "2D" || currentMode === "ANIME") && typeof active2DFn === "function") {
+          ctx2d.fillStyle = "#04050e";
+          ctx2d.fillRect(0, 0, canvas2d.width, canvas2d.height);
+          active2DFn(ctx2d, canvas2d.width, canvas2d.height, elapsed);
+          masterRecordCtx.fillStyle = "#04050e";
+          masterRecordCtx.fillRect(0, 0, 1280, 720);
+          masterRecordCtx.drawImage(canvas2d, 0, 0, 1280, 720);
+        } else if (currentMode === "3D" && threeRenderer && threeScene && threeCamera) {
+          if (typeof active3DUpdate === "function") active3DUpdate(elapsed);
+          threeRenderer.render(threeScene, threeCamera);
+          masterRecordCtx.fillStyle = "#04050e";
+          masterRecordCtx.fillRect(0, 0, 1280, 720);
+          masterRecordCtx.drawImage(canvas3d, 0, 0, 1280, 720);
+        }
+      } catch (e) {}
+    }
+    requestAnimationFrame(masterAnimationLoop);
+
+    function togglePause() {
+      isPaused = !isPaused;
+      document.getElementById("pauseBtn").textContent = isPaused ? "▶ RESUME" : "⏸ PAUSE";
+    }
+
+    function resetPreview() {
+      startTime = performance.now();
+      isPaused = false;
+      document.getElementById("pauseBtn").textContent = "⏸ PAUSE";
+    }
+
+    function fullscreenPreview() {
+      const el = document.getElementById("previewContainer");
+      if (el.requestFullscreen) el.requestFullscreen();
+    }
+
+    function openAndPlayRecordedVideo() {
+      const card = document.getElementById("videoPlayerCard");
+      card.style.display = "flex";
+      card.scrollIntoView({ behavior: "smooth" });
+      const vid = document.getElementById("recordedVideoPreview");
+      if (!vid.src) {
+        showBanner("Recording 5s video for live playback...", false);
+        recordAndExportVideo();
+        return;
+      }
+      vid.currentTime = 0;
+      vid.play();
+    }
+
+    function replayRecordedVideo() {
+      const vid = document.getElementById("recordedVideoPreview");
+      vid.currentTime = 0;
+      vid.play();
+    }
+
+    function recordAndExportVideo() {
+      const durationSec = parseInt(document.getElementById("durationSelect").value, 10) || 5;
+      const preferredFormat = document.getElementById("formatSelect").value;
+      const exportBtn = document.getElementById("exportBtn");
+      const recInd = document.getElementById("recIndicator");
+      const recTimer = document.getElementById("recTimer");
+      const playerCard = document.getElementById("videoPlayerCard");
+
+      isPaused = false;
+      startTime = performance.now();
+      const stream = masterRecordCanvas.captureStream(60);
+      const mimes = ["video/mp4;codecs=avc1.42E01E", "video/mp4", "video/webm;codecs=h264", "video/webm;codecs=vp9", "video/webm"];
+      let chosen = "";
+      for (let i = 0; i < mimes.length; i++) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(mimes[i])) { chosen = mimes[i]; break; }
+      }
+
+      const recorder = chosen ? new MediaRecorder(stream, { mimeType: chosen, videoBitsPerSecond: 6500000 }) : new MediaRecorder(stream);
+      const chunks = [];
+      recorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+      exportBtn.disabled = true;
+      recInd.style.display = "flex";
+      let secLeft = durationSec;
+      recTimer.textContent = secLeft + "s";
+
+      const tid = setInterval(function() {
+        secLeft--;
+        if (secLeft >= 0) {
+          recTimer.textContent = secLeft + "s";
+          exportBtn.textContent = "🔴 RECORDING (" + secLeft + "s)...";
+        }
+      }, 1000);
+
+      recorder.onstop = function() {
+        clearInterval(tid);
+        recInd.style.display = "none";
+        exportBtn.disabled = false;
+        exportBtn.textContent = "🔴 RECORD & SAVE MP4";
+
+        const mp4Blob = new Blob(chunks, { type: "video/mp4" });
+        const webmBlob = new Blob(chunks, { type: chosen || "video/webm" });
+        const mp4Url = URL.createObjectURL(mp4Blob);
+        const webmUrl = URL.createObjectURL(webmBlob);
+
+        const stamp = Date.now();
+        document.getElementById("downloadMp4Btn").href = mp4Url;
+        document.getElementById("downloadMp4Btn").download = "animatrix-hd-" + stamp + ".mp4";
+        document.getElementById("downloadWebmBtn").href = webmUrl;
+        document.getElementById("downloadWebmBtn").download = "animatrix-hd-" + stamp + ".webm";
+
+        const videoEl = document.getElementById("recordedVideoPreview");
+        videoEl.src = webmUrl;
+        playerCard.style.display = "flex";
+        videoEl.play().catch(function(){});
+
+        const autoA = document.createElement("a");
+        autoA.style.display = "none";
+        autoA.href = preferredFormat === "mp4" ? mp4Url : webmUrl;
+        autoA.download = "animatrix-hd-" + stamp + "." + preferredFormat;
+        document.body.appendChild(autoA);
+        autoA.click();
+        setTimeout(function() { document.body.removeChild(autoA); }, 1000);
+
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        showBanner("🎬 Video Recorded! Playing live below.", false);
+        playerCard.scrollIntoView({ behavior: "smooth" });
+      };
+
+      recorder.start(100);
+      setTimeout(function() { if (recorder.state !== "inactive") recorder.stop(); }, durationSec * 1000);
+    }
+
+    async function enhancePromptWithAI() {
+      const raw = promptInput.value.trim();
+      if (!raw) { showBanner("Write a short prompt first!", true); return; }
+      try {
+        showBanner("🪄 Enhancing prompt with Auto-Shifter AI...", false);
+        const res = await callCloudAIWithShifter(
+          "Rewrite the user's idea into a vivid 2-sentence animation prompt with dramatic lighting and smooth motion. Output ONLY the prompt.",
+          raw, 250
+        );
+        promptInput.value = res.content.trim();
+        showBanner("✨ Enhanced using " + res.usedKey + "!", false);
+      } catch (e) { showBanner("Error: " + e.message, true); }
+    }
+
+    async function generateWithAI(isRevision) {
+      const input = promptInput.value.trim();
+      if (!input) { showBanner("Write an animation prompt first!", true); return; }
+      const btn = document.getElementById("generateBtn");
+      btn.disabled = true;
+      btn.textContent = "⚡ SHIFTING KEY & GENERATING...";
+
+      const sysPrompt = currentMode === "3D"
+        ? "You are a Three.js artist. Output ONLY valid JavaScript code under 90 lines defining function createScene(THREE, scene, camera, renderer) { ... return function update(t) { ... }; } without markdown fences."
+        : "You are a 2D Canvas & Anime FX artist. Output ONLY valid JavaScript code under 90 lines defining function renderFrame(ctx, width, height, t) { ... } without markdown fences.";
+
+      const userContent = isRevision ? "Current code:\n" + codeEditor.value + "\n\nModify: " + input : "Create a stunning animated scene for: " + input;
+
+      try {
+        const result = await callCloudAIWithShifter(sysPrompt, userContent, 3200);
+        const healed = healJavaScriptCode(result.content, currentMode);
+        codeEditor.value = healed;
+        document.getElementById("directCustomCodeInput").value = healed;
+        document.getElementById("fpsCounter").textContent = "KEY USED: " + result.usedKey;
+        runCurrentCode();
+        showBanner("💎 Generated via " + result.usedKey + "!", false);
+      } catch (err) {
+        showBanner("Loaded Built-in Masterpiece Scene", false);
+        runCurrentCode();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "⚡ GENERATE ANIMATION (AUTO-SHIFT KEY)";
+      }
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText(codeEditor.value);
+      showBanner("Copied JS code!", false);
+    }
+
+    function downloadJS() {
+      const blob = new Blob([codeEditor.value], { type: "text/javascript" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "animatrix-" + currentMode.toLowerCase() + ".js";
+      a.click();
+    }
+
+    // ---------------- 4. E2EE CHAT + 1-3m PASSCODE + CALL + CLONE ----------------
+    let peerInstance = null, activeConn = null, activeMediaCall = null, localMediaStream = null;
+    let currentRoomId = "", passcodeExpiresAt = 0, expiryIntervalId = null;
+
+    async function deriveRoomKey(passcode) {
+      const enc = new TextEncoder();
+      const baseKey = await crypto.subtle.importKey("raw", enc.encode(passcode.trim()), { name: "PBKDF2" }, false, ["deriveKey"]);
+      return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: enc.encode("ANIMATRIX_V10_SALT"), iterations: 50000, hash: "SHA-256" },
+        baseKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptE2EE(plainText, passcode) {
+      const key = await deriveRoomKey(passcode);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const cipherBuf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(plainText));
+      return {
+        iv: btoa(String.fromCharCode.apply(null, iv)),
+        ct: btoa(String.fromCharCode.apply(null, new Uint8Array(cipherBuf)))
+      };
+    }
+
+    async function decryptE2EE(payload, passcode) {
+      const key = await deriveRoomKey(passcode);
+      const iv = Uint8Array.from(atob(payload.iv), function(c) { return c.charCodeAt(0); });
+      const ct = Uint8Array.from(atob(payload.ct), function(c) { return c.charCodeAt(0); });
+      const plainBuf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
+      return new TextDecoder().decode(plainBuf);
+    }
+
+    function startPasscodeExpiryTimer(expiresTimestamp) {
+      passcodeExpiresAt = expiresTimestamp;
+      if (expiryIntervalId) clearInterval(expiryIntervalId);
+      const badge = document.getElementById("passcodeTimerBadge");
+      function tick() {
+        const leftMs = passcodeExpiresAt - Date.now();
+        if (leftMs <= 0) {
+          clearInterval(expiryIntervalId);
+          badge.textContent = "⛔ PASSCODE EXPIRED! Click Reset Timer";
+          return;
+        }
+        const sec = Math.ceil(leftMs / 1000);
+        badge.textContent = "⏱ Passcode Active: " + Math.floor(sec / 60) + "m " + (sec % 60) + "s left";
+      }
+      tick();
+      expiryIntervalId = setInterval(tick, 1000);
+    }
+
+    function renewPasscodeWindow() {
+      const mins = parseInt(document.getElementById("passcodeExpirySelect").value, 10) || 2;
+      startPasscodeExpiryTimer(Date.now() + mins * 60 * 1000);
+    }
+
+    function createTimeLimitedRoom() {
+      const pass = document.getElementById("roomPasscode").value.trim() || "7890";
+      const mins = parseInt(document.getElementById("passcodeExpirySelect").value, 10) || 2;
+      const expTime = Date.now() + mins * 60 * 1000;
+      currentRoomId = "ax10-" + Math.random().toString(36).substring(2, 9);
+      initPeerNode(currentRoomId);
+      startPasscodeExpiryTimer(expTime);
+      const shareUrl = window.location.origin + window.location.pathname + "#room=" + encodeURIComponent(currentRoomId) + "&exp=" + expTime;
+      document.getElementById("inviteLinkBox").style.display = "flex";
+      document.getElementById("generatedInviteUrl").value = shareUrl;
+      navigator.clipboard.writeText(shareUrl).catch(function(){});
+      appendChatBubble("SYSTEM", "🔗 E2EE Room Created! Link copied (" + mins + " min passcode: " + pass + ").", "clone");
+    }
+
+    function copyInviteLink() {
+      navigator.clipboard.writeText(document.getElementById("generatedInviteUrl").value);
+    }
+
+    function initPeerNode(customId) {
+      if (peerInstance) peerInstance.destroy();
+      peerInstance = customId ? new Peer(customId) : new Peer();
+      peerInstance.on("open", function(id) {
+        document.getElementById("peerStatusBadge").textContent = "ONLINE (" + id + ")";
+      });
+      peerInstance.on("connection", function(conn) { setupDataConnection(conn, true); });
+      peerInstance.on("call", async function(call) {
+        try {
+          const wantVideo = call.metadata && call.metadata.video;
+          localMediaStream = await navigator.mediaDevices.getUserMedia({ video: Boolean(wantVideo), audio: true });
+          document.getElementById("videoCallStage").style.display = "grid";
+          document.getElementById("endCallBtn").style.display = "inline-block";
+          document.getElementById("localVideo").srcObject = localMediaStream;
+          call.answer(localMediaStream);
+          activeMediaCall = call;
+          call.on("stream", function(rem) { document.getElementById("remoteVideo").srcObject = rem; });
+          call.on("close", endActiveCall);
+        } catch (e) {}
+      });
+    }
+
+    function joinRoomWithPasscode() {
+      let rawTarget = document.getElementById("joinRoomIdInput").value.trim();
+      if (!rawTarget) return;
+      let expFromUrl = 0;
+      if (rawTarget.includes("room=")) {
+        const mR = rawTarget.match(/room=([^&]+)/);
+        const mE = rawTarget.match(/exp=(\d+)/);
+        if (mR) rawTarget = decodeURIComponent(mR[1]);
+        if (mE) expFromUrl = parseInt(mE[1], 10);
+      }
+      if (expFromUrl > 0 && Date.now() > expFromUrl) {
+        appendChatBubble("SECURITY", "⛔ Passcode time window expired!", "clone");
+        return;
+      }
+      if (!peerInstance) initPeerNode();
+      setTimeout(function() { setupDataConnection(peerInstance.connect(rawTarget), false); }, 600);
+    }
+
+    function setupDataConnection(conn, isHost) {
+      activeConn = conn;
+      conn.on("open", async function() {
+        const myPass = document.getElementById("roomPasscode").value.trim();
+        if (!isHost) {
+          const proof = await encryptE2EE("OK", myPass);
+          conn.send({ type: "AUTH", proof: proof, sender: document.getElementById("myChatName").value });
+        }
+      });
+      conn.on("data", async function(pkt) {
+        const myPass = document.getElementById("roomPasscode").value.trim();
+        if (pkt.type === "AUTH") {
+          try {
+            if ((await decryptE2EE(pkt.proof, myPass)) === "OK") {
+              conn.send({ type: "AUTH_OK", host: document.getElementById("myChatName").value });
+              appendChatBubble("SECURITY", "✅ " + pkt.sender + " joined E2EE Room!", "clone");
+            }
+          } catch (e) { conn.close(); }
+        } else if (pkt.type === "AUTH_OK") {
+          appendChatBubble("SECURITY", "✅ Connected to " + pkt.host + "!", "clone");
+        } else if (pkt.type === "MSG") {
+          try {
+            const plain = await decryptE2EE(pkt.cipher, myPass);
+            const inLang = document.getElementById("incomingTranslateSelect").value;
+            let trans = "";
+            if (inLang !== "none") {
+              const r = await callCloudAIWithShifter("Translate into " + inLang + ". Output ONLY translation.", plain, 200);
+              trans = r.content.trim();
+            }
+            appendChatBubble(pkt.sender, plain, pkt.isClone ? "clone" : "peer", trans);
+            if (!pkt.isClone && document.getElementById("cloneActiveToggle").checked) {
+              await triggerAIHumanCloneReply(plain, true);
+            }
+          } catch (e) {}
+        }
+      });
+    }
+
+    function appendChatBubble(sender, text, cls, subText) {
+      const box = document.getElementById("chatMessagesBox");
+      const div = document.createElement("div");
+      div.className = "bubble " + (cls || "peer");
+      div.innerHTML = "<div class='b-meta'>" + sender + "</div><div>" + text + "</div>" +
+        (subText ? "<div class='b-trans'>🌐 " + subText + "</div>" : "");
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendEncryptedChatMessage(customText) {
+      const inp = document.getElementById("chatInputBox");
+      const raw = customText !== undefined ? customText : inp.value.trim();
+      if (!raw) return;
+      if (customText === undefined) inp.value = "";
+      const myName = document.getElementById("myChatName").value || "Me";
+      const outLang = document.getElementById("outgoingTranslateSelect").value;
+      let toSend = raw, sub = "";
+      if (outLang !== "none") {
+        try {
+          const r = await callCloudAIWithShifter("Translate into " + outLang + ". Output ONLY translation.", raw, 200);
+          sub = r.content.trim();
+          toSend = sub + " (" + raw + ")";
+        } catch (e) {}
+      }
+      appendChatBubble(myName + " (You)", raw, "me", sub);
+      if (activeConn && activeConn.open) {
+        const cipher = await encryptE2EE(toSend, document.getElementById("roomPasscode").value.trim());
+        activeConn.send({ type: "MSG", sender: myName, cipher: cipher, isClone: false });
+      } else if (document.getElementById("cloneActiveToggle").checked) {
+        await triggerAIHumanCloneReply(raw, false);
+      }
+    }
+
+    async function triggerAIHumanCloneReply(userText, sendPeer) {
+      const persona = document.getElementById("clonePersonaInput").value.trim();
+      const myName = document.getElementById("myChatName").value || "Gourav";
+      try {
+        const r = await callCloudAIWithShifter(
+          "You are the AI Human Clone of " + myName + ". Instructions: " + persona + ". Reply briefly like a real friend.",
+          userText, 200
+        );
+        const reply = r.content.trim();
+        appendChatBubble("🤖 " + myName + "'s Clone (" + r.usedKey + ")", reply, "clone");
+        if (sendPeer && activeConn && activeConn.open) {
+          const cipher = await encryptE2EE(reply, document.getElementById("roomPasscode").value.trim());
+          activeConn.send({ type: "MSG", sender: "🤖 " + myName + " Clone", cipher: cipher, isClone: true });
+        }
+      } catch (e) {}
+    }
+
+    async function askHumanCloneDirectly() {
+      const inp = document.getElementById("chatInputBox");
+      const msg = inp.value.trim() || "Bhai kahan hai? Kab free hoga?";
+      inp.value = "";
+      appendChatBubble("Friend", msg, "peer");
+      await triggerAIHumanCloneReply(msg, false);
+    }
+
+    async function startMediaCall(withVideo) {
+      if (!activeConn || !activeConn.open) {
+        appendChatBubble("CALL", "⚠ Connect with a friend via Invite Link first.", "clone");
+        return;
+      }
+      try {
+        localMediaStream = await navigator.mediaDevices.getUserMedia({ video: Boolean(withVideo), audio: true });
+        document.getElementById("videoCallStage").style.display = "grid";
+        document.getElementById("endCallBtn").style.display = "inline-block";
+        document.getElementById("localVideo").srcObject = localMediaStream;
+        const call = peerInstance.call(activeConn.peer, localMediaStream, { metadata: { video: Boolean(withVideo) } });
+        activeMediaCall = call;
+        call.on("stream", function(rem) { document.getElementById("remoteVideo").srcObject = rem; });
+      } catch (e) {}
+    }
+
+    function endActiveCall() {
+      if (activeMediaCall) { activeMediaCall.close(); activeMediaCall = null; }
+      if (localMediaStream) { localMediaStream.getTracks().forEach(function(t) { t.stop(); }); localMediaStream = null; }
+      document.getElementById("videoCallStage").style.display = "none";
+      document.getElementById("endCallBtn").style.display = "none";
+    }
+
+    const scheduledQueue = [];
+    function addScheduledMessage() {
+      const inp = document.getElementById("scheduleMsgInput");
+      if (!inp.value.trim()) return;
+      const delay = parseInt(document.getElementById("scheduleDelaySelect").value, 10) || 60;
+      scheduledQueue.push({ text: inp.value.trim(), sendAt: Date.now() + delay * 1000 });
+      inp.value = "";
+      renderScheduleQueue();
+    }
+
+    function renderScheduleQueue() {
+      document.getElementById("scheduledCountBadge").textContent = scheduledQueue.length + " Pending";
+      const box = document.getElementById("scheduleListBox");
+      box.innerHTML = "";
+      scheduledQueue.forEach(function(it) {
+        const left = Math.max(0, Math.ceil((it.sendAt - Date.now()) / 1000));
+        const d = document.createElement("div");
+        d.style.cssText = "display:flex;justify-content:space-between;font-size:0.75rem;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:8px;";
+        d.innerHTML = "<span>⏰ " + it.text.slice(0, 24) + "</span><b>" + left + "s</b>";
+        box.appendChild(d);
+      });
+    }
+
+    setInterval(function() {
+      if (!scheduledQueue.length) return;
+      const now = Date.now();
+      for (let i = scheduledQueue.length - 1; i >= 0; i--) {
+        if (now >= scheduledQueue[i].sendAt) {
+          sendEncryptedChatMessage(scheduledQueue.splice(i, 1)[0].text);
+        }
+      }
+      renderScheduleQueue();
+    }, 1000);
+
+    // ---------------- 5. LIVE QUICK PATCHER & FUTURE SLOTS ----------------
+    async function applyLiveQuickPatch() {
+      const raw = document.getElementById("quickPatchInput").value.trim();
+      const msgEl = document.getElementById("patchStatusMsg");
+      if (!raw) return;
+      msgEl.textContent = "⚡ Applying patch...";
+      try {
+        let jsToRun = raw;
+        if (!/document\.|window\.|function\s|\{|\=/.test(raw)) {
+          const res = await callCloudAIWithShifter(
+            "You are a live DOM & JS patch generator for ANIMATRIX OS. Convert the user's request into raw executable browser JavaScript that modifies the page DOM, CSS styles, or window.PRESETS. Output ONLY raw JS code, no markdown.",
+            raw, 600
+          );
+          jsToRun = res.content.replace(/^```(?:javascript|js)?\s*/i, "").replace(/```\s*$/i, "").trim();
+        }
+        new Function(jsToRun)();
+        const savedPatches = JSON.parse(localStorage.getItem("animatrix_live_patches") || "[]");
+        savedPatches.push(jsToRun);
+        localStorage.setItem("animatrix_live_patches", JSON.stringify(savedPatches));
+        msgEl.textContent = "✅ Patch Applied Successfully & Saved!";
+      } catch (err) {
+        msgEl.textContent = "⚠ Patch Error: " + err.message;
+      }
+    }
+
+    function clearSavedPatches() {
+      localStorage.removeItem("animatrix_live_patches");
+      location.reload();
+    }
+
+    function runAllSavedPatches() {
+      const savedPatches = JSON.parse(localStorage.getItem("animatrix_live_patches") || "[]");
+      savedPatches.forEach(function(code) {
+        try { new Function(code)(); } catch (e) {}
+      });
+      if (window.ANIMATRIX_PATCHES && Array.isArray(window.ANIMATRIX_PATCHES)) {
+        window.ANIMATRIX_PATCHES.forEach(function(fn) {
+          try { fn(); } catch (e) {}
+        });
+      }
+    }
+
+    const defaultFutureSlots = [
+      { title: "Slot #1: AI Voice Dubbing Studio", desc: "Reserved slot for custom voice cloning & anime lip-sync.", tag: "FUTURE SLOT 1" },
+      { title: "Slot #2: Interactive WebGL Game Maker", desc: "Reserved slot for 3D physics & playable mini-games.", tag: "FUTURE SLOT 2" },
+      { title: "Slot #3: Beat-Synced Music Visualizer", desc: "Reserved slot for audio-reactive shaders.", tag: "FUTURE SLOT 3" },
+      { title: "Slot #4: Custom User Plugin", desc: "Add any new module here anytime.", tag: "FUTURE SLOT 4" }
+    ];
+
+    function renderFutureSlots() {
+      const saved = JSON.parse(localStorage.getItem("animatrix_v10_slots") || "null") || defaultFutureSlots;
+      const grid = document.getElementById("futureSlotsGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      saved.forEach(function(s) {
+        const c = document.createElement("div");
+        c.className = "launcher-tile";
+        c.style.borderStyle = "dashed";
+        c.innerHTML = "<span class='tile-badge'>" + s.tag + "</span><h2>🧩 " + s.title + "</h2><p>" + s.desc + "</p>";
+        grid.appendChild(c);
+      });
+    }
+
+    function addCustomFutureSlot() {
+      const t = document.getElementById("customFeatureTitle").value.trim();
+      const d = document.getElementById("customFeatureDesc").value.trim();
+      if (!t) return;
+      const saved = JSON.parse(localStorage.getItem("animatrix_v10_slots") || "null") || defaultFutureSlots;
+      saved.unshift({ title: t, desc: d || "Custom module ready.", tag: "CUSTOM ADDED" });
+      localStorage.setItem("animatrix_v10_slots", JSON.stringify(saved));
+      document.getElementById("customFeatureTitle").value = "";
+      document.getElementById("customFeatureDesc").value = "";
+      renderFutureSlots();
+    }
+
+    initKeyPool();
+    loadPreset("rabbit");
+    renderFutureSlots();
+    runAllSavedPatches();
+    if ((window.location.hash || "").includes("room=")) {
+      openAppView("chat");
+      document.getElementById("joinRoomIdInput").value = window.location.href;
+    }
+  </script>
+</body>
+</html>

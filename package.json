@@ -1,0 +1,9 @@
+{
+  "name": "animatrix-ai",
+  "version": "3.0.0",
+  "description": "Groq-powered 2D & 3D AI Animation Studio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
